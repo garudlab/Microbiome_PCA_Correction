@@ -3,7 +3,7 @@ local = TRUE
 
 require(dplyr)
 if(local){
-  args = c("AGPr_complete_otu","rel","False","AUC")
+  args = c("AGPr_max_k5","rel","False","AUC")
   
 }
 dtype_pca = "counts"
@@ -13,7 +13,7 @@ margins_list[["Gibbonsr_complete_otu"]] =c(16,17)
 margins_list[["Gibbonsr_max_k5"]] =c(16,17)
 margins_list[["Gibbonsr_max_k7"]] =c(16,17)
 margins_list[["Gibbonsr_max_k8"]] =c(16,17)
-margins_list[["Thomasr_complete_otu"]] =c(15,13)
+margins_list[["Thomasr_complete_otu"]] =c(13,13)
 margins_list[["Thomasr_max_k7"]] =c(15,13)
 margins_list[["AGPr_complete_otu"]] =c(5,13)
 margins_list[["AGPr_max_k8"]] =c(5,13)
@@ -22,12 +22,12 @@ margins_list[["Kaplanr_complete_otu"]] =c(5,13)
 folder_spec = list()
 folder_spec[["AGPr_max_k5"]] = list(nocorrection = "AGPr_max_k5",
                                     combat =  "AGPr_max_k5",
-                                    DCC =   "AGPr_max_k5",
+                                    DCC =   "AGPr_max_k8",
                                     limma =  "AGPr_max_k5",
-                                    bmc =   "AGPr_max_k7",
+                                    bmc =   "AGPr_max_k8",
                                     clr =   "AGPr_max_k5",
-                                    clr_pca1counts = "AGPr_max_k7",
-                                    clr_pca33counts = "AGPr_max_k7")
+                                    clr_pca3counts = "AGPr_max_k8",
+                                    clr_pca33counts = "AGPr_max_k8")
 folder_spec[["Gibbonsr_max_k5"]] = list(nocorrection = "Gibbonsr_max_k8",
                                     combat =  "Gibbonsr_max_k8",
                                     DCC =   "Gibbonsr_max_k8",
@@ -78,7 +78,7 @@ data_dir = paste0(main_dir,folder,"/")
 # "bmc", "combat", "percentilenorm", "limma", "DCC", a
 #pca_methods = c(paste0("clr_pca",c(1,2,3,4,5,33),dtype_pca)) #,paste0("clr_pca",c(1:5)))
 
-pca_methods = c(paste0(extra_trans,"pca",c(1,33),dtype_pca)) #,paste0("clr_pca",c(1:5)))
+pca_methods = c(paste0(extra_trans,"pca",c(3,33),dtype_pca)) #,paste0("clr_pca",c(1:5)))
 #   c("clr_scale_pca",
 # "clr_pca1roundcounts", "clr_pca1", "clr_pca2roundcounts", "clr_pca2", "clr_pca3roundcounts", "clr_pca3")
 other_methods = c("nocorrection","DCC","combat","limma","bmc","clr") #,"logCPM","vsd" ) # , 
@@ -121,7 +121,7 @@ corrections_df$corrections = corrections_vec
 
 ### INSPECT VAL AUC only keep pca result with highest val
 if(any(grepl("pca", corrections_vec))){
-  corrections_temp = corrections_df %>% filter(grepl("pca",corrections))
+  corrections_temp = corrections_df %>% filter(grepl("pca",corrections) & !grepl("33",corrections))
   pca_method_best = corrections_temp$corrections[which.max(unlist(corrections_temp %>% select(mean_val_auc)))]
   
   
@@ -154,7 +154,7 @@ if(lodo == "True"){
   
   
   if(grepl("Thomas",folder )){
-    input = input[,c("FengQ_2015", "ThomasAM_2018b",  "ZellerG_2014", "YuJ_2015" ,  "ThomasAM_2018a" , "VogtmannE_2016"  ,"HanniganGD_2017","Average"  )]
+    input = input[,c("Average","FengQ_2015", "ThomasAM_2018b",  "ZellerG_2014", "YuJ_2015" ,  "ThomasAM_2018a" , "VogtmannE_2016"  ,"HanniganGD_2017" )]
   }
   
   colnames(input) = gsub("_", " ", colnames(input))
@@ -170,9 +170,9 @@ if(lodo == "True"){
   
   # blue palette c("#FFFFFF", "#2B9EDE"
   pdf(paste0(data_dir,"/",meas,"LODO_Heatmap_",trans, ".pdf"))
-  heatmap.2(input, trace="none", density="none", col=colorRampPalette(c("red","yellow")), cexRow=1.2, cexCol=1.2, 
+  heatmap.2(t(input), trace="none", density="none", col=colorRampPalette(c("red","yellow")), cexRow=1.2, cexCol=1.2, 
             margins = margins_list[[folder]],
-            Rowv = FALSE, Colv =  "Rowv",cellnote=input_str,notecol="black",srtCol = 45,notecex=notecex_list[[folder]])
+            Rowv = FALSE, Colv =  "Rowv",cellnote=t(input_str),notecol="black",srtCol = 45,notecex=notecex_list[[folder]])
   dev.off()
  
  
@@ -214,16 +214,42 @@ custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#72C1FC","#
 #palette = "jco"
 p <- ggboxplot(to_plot, x = "Var1", y = "value",
                fill = "Var1", palette = custom_colors) +xlab("Correction") + 
-  theme(text = element_text(size=15))+
    ylab(paste0("Cross-validated ", meas) ) + 
-  stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#86B78F",vjust=1) + 
-  stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#e32f27") + 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),legend.position = "none",
+  stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#e32f27",
+                     method.args = list(alternative = "greater"),hide.ns=TRUE) + 
+  stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#808080",
+                     method.args = list(alternative = "less"),hide.ns=TRUE) + 
+  #stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#86B78F",vjust=1,method.args = list(alternative = "greater")) + 
+  #stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#e32f27",method.args = list(alternative = "greater")) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=19),
+        legend.position = "none",
         panel.grid.major.x = element_blank() ,
           # explicitly set the horizontal lines (or they will disappear too)
-          panel.grid.major.y = element_line( size=.1, color="black" )) 
+          panel.grid.major.y = element_line( size=.1, color="black" ))
+p
+my_comparisons_DCC  = list()
+my_comparisons_DCC[[1]] = c("DCC","Fixed PCA Correction")
 
+my_comparisons_Uncorr  = list()
+for(cv in c(3,4,5,6,8)){
+  my_comparisons_Uncorr[[cv]] = c(row.names(AUC_results)[1],row.names(AUC_results)[cv])
+}
 
+# p <- ggboxplot(to_plot, x = "Var1", y = "value",
+#                fill = "Var1", palette = custom_colors) +xlab("Correction") + 
+#   ylab(paste0("Cross-validated ", meas) ) + 
+#   stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#86B78F",vjust=1,method.args = list(alternative = "greater"),hide.ns = TRUE) + 
+#   stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#e32f27",method.args = list(alternative = "greater"),hide.ns = TRUE) + 
+#   stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#BDBDBD",method.args = list(alternative = "less"),hide.ns = TRUE) + 
+#   stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#BDBDBD",method.args = list(alternative = "less"),hide.ns = TRUE) + 
+#   
+#   
+#   theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=19),
+#         legend.position = "none",
+#         panel.grid.major.x = element_blank() ,
+#         # explicitly set the horizontal lines (or they will disappear too)
+#         panel.grid.major.y = element_line( size=.1, color="black" ))
+# p
 if(grepl("Gibbonsr",folder) & lodo == "False"){
   p<- p + ylim(0.55,0.93) 
 }  

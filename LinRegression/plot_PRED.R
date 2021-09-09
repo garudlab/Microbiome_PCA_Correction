@@ -9,10 +9,10 @@ if(local){
 dtype_pca = "counts"
 margins_list = list()
 margins_list[["Gibbonsr_complete_otu"]] =c(16,17)
-margins_list[["Thomasr_complete_otu"]] =c(15,13)
+margins_list[["Thomasr_complete_otu"]] =c(13,15)
 margins_list[["Thomasr_max_k7"]] =c(15,13)
 margins_list[["AGPr_complete_otu"]] =c(5,13)
-margins_list[["Kaplanr_complete_otu"]] =c(5,13)
+margins_list[["Kaplanr_complete_otu"]] =c(12,9)
 margins_list[["Kaplanr_max_k6"]] =c(5,13)
 margins_list[["Kaplanr_max_k5"]] =c(5,13)
 margins_list[["Kaplanr_max_k7"]] =c(5,13)
@@ -41,7 +41,7 @@ notecex_list[["Gibbonsr_complete_otu"]] = 1
 notecex_list[["Thomasr_complete_otu"]] = 1
 notecex_list[["Thomasr_max_k7"]] = 1
 notecex_list[["AGPr_complete_otu"]] = 1
-notecex_list[["Kaplanr_complete_otu"]] = 1.6
+notecex_list[["Kaplanr_complete_otu"]] = 1.4
 notecex_list[["Kaplanr_max_k6"]] = 1
 notecex_list[["Kaplanr_max_k5"]] = 1
 notecex_list[["Kaplanr_max_k7"]] = 1
@@ -70,7 +70,7 @@ data_dir = paste0(main_dir,folder,"/")
 
 
 # "bmc", "combat", "percentilenorm", "limma", "DCC", a
-pca_methods = c(paste0("clr_pca",c(c(1,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
+pca_methods = c(paste0("clr_pca",c(c(1,2,3,4,5,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
 #   c("clr_scale_pca",
 # "clr_pca1roundcounts", "clr_pca1", "clr_pca2roundcounts", "clr_pca2", "clr_pca3roundcounts", "clr_pca3")
 other_methods = c("nocorrection","DCC","combat","limma","bmc","clr") # "combat", 
@@ -150,7 +150,10 @@ if(lodo == "True"){
   
   
   if(grepl("Thomas",folder )){
-    input = input[,c("FengQ_2015", "ThomasAM_2018b",  "ZellerG_2014", "YuJ_2015" ,  "ThomasAM_2018a" , "VogtmannE_2016"  ,"HanniganGD_2017","Average"  )]
+    input = input[,c("Average" ,"FengQ_2015", "ThomasAM_2018b",  "ZellerG_2014", "YuJ_2015" ,  "ThomasAM_2018a" , "VogtmannE_2016"  ,"HanniganGD_2017" )]
+  }
+  if(grepl("Kaplan",folder )){
+    input = input[,c("Average","HOWE_KF1",   "HOWE_KF2",   "HOWE_KF3",   "HOWE_KF4"    )]
   }
   
   colnames(input) = gsub("_", " ", colnames(input))
@@ -166,9 +169,9 @@ if(lodo == "True"){
   
   ##2B9EDE
   pdf(paste0(data_dir,"/",meas,"LODO_Heatmap_",trans, ".pdf"))
-  heatmap.2(input, trace="none", density="none", col=colorRampPalette(c("red", "yellow")), cexRow=notecex_text_list[[folder]], cexCol=1.2, 
+  heatmap.2(t(input), trace="none", density="none", col=colorRampPalette(c("red", "yellow")), cexRow=1.4, cexCol= 1.6, 
             margins = margins_list[[folder]],
-            Rowv = FALSE, Colv =  "Rowv",cellnote=input_str,notecol="black",srtCol = 45,notecex=notecex_list[[folder]])
+            Rowv = FALSE, Colv =  "Rowv",cellnote=t(input_str),notecol="black",srtCol = 45,notecex=notecex_list[[folder]])
   dev.off()
  
  
@@ -214,22 +217,28 @@ library(ggpubr)
 custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#72C1FC","#72C1FC","#72C1FC","#72C1FC","#72C1FC","#0093FF")[presence_index ]
 # 
 # stat_compare_means(comparisons = my_comparisons_dcc ,bracket.size = 0,ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE) + 
-#   stat_compare_means(comparisons = my_comparisons_uncorr, bracket.size = 0,ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE) + 
+#   stat_compare_means(comparisons = my_comparisonas_uncorr, bracket.size = 0,ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE) + 
 #   
 #palette = "jco"
+
 p <- ggboxplot(to_plot, x = "Var1", y = "value",
                fill = "Var1", palette = custom_colors) +xlab("Correction") + 
   
-  stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#86B78F",vjust=1) + 
-  stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#e32f27") + 
-  
+  #stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#86B78F",vjust=1) + 
+  stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#e32f27",
+                     method.args = list(alternative = "greater"),hide.ns=TRUE) + 
+  stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#808080",
+                     method.args = list(alternative = "less"),hide.ns=TRUE) + 
   theme(text = element_text(size=13))+
    ylab(paste0("Cross-validated " , meas) ) + 
-  theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),legend.position = "none",
+  theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=18),legend.position = "none",
         panel.grid.major.x = element_blank() ,
           # explicitly set the horizontal lines (or they will disappear too)
           panel.grid.major.y = element_line( size=.1, color="black" )) 
 p
+if(grepl("Kaplanr",folder) & lodo == "True"){
+  p<- p + ylim(-0.05,0.17) 
+} 
 if(grepl("Kaplanr",folder) & lodo == "False"){
     p<- p + ylim(-0.15,0.3) 
 }  

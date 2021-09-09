@@ -217,7 +217,7 @@ for method in nocorrection bmc combat limma DCC clr_pca1counts clr_pca2counts cl
 
 
 metric=val_auc
-for method in nocorrection bmc limma; do python process_rf_result.py --folder AGPr_max_k8 --trans rel --correction $method --lodo 0 --phenotype bin_antibiotic_last_year --metric $metric; done
+for method in method in nocorrection bmc combat limma DCC clr_pca1counts clr_pca2counts clr_pca3counts clr_pca4counts clr_pca5counts; do python process_rf_result.py --folder AGPr_max_k8 --trans rel --correction $method --lodo 0 --phenotype bin_antibiotic_last_year --metric $metric; done
 
 
 

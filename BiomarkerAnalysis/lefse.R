@@ -134,18 +134,40 @@ dev.off()
 
 saveRDS(lefse_list,paste0(data_dir ,"/upset_",trans,"_",correction,".rds"))
 
-
+# trans = "rel"
+# correction = "uncorrected"
+if(grepl("Kaplan",folder)){
+  spec_max = 60
+  spec_height = 9
+  spec_height2 = 4
+  spec_width=11
+  spec_text=4
+}else{
+  spec_text=3.5
+  spec_max = 250
+  spec_width = 12
+  spec_height = 10
+  spec_height2 = 10
+}
 lefse_list = readRDS(paste0(data_dir ,"/upset_",trans,"_",correction,".rds"))
 names(lefse_list) = gsub("_"," ",names(lefse_list))
-pdf(paste0(data_dir ,"/upset_",trans,"_",correction,".pdf"))
+pdf(paste0(data_dir ,"/upset_",trans,"_",correction,".pdf"),width=spec_width,height=spec_height)
 
-upset(fromList(lefse_list),order.by="freq",nsets=7,text.scale=2,mainbar.y.max = 60)
+upset(fromList(lefse_list),order.by="freq",nsets=7,text.scale=spec_text,
+      mainbar.y.max =spec_max,point.size=5,line.size=2)
+
+dev.off()
+
+pdf(paste0(data_dir ,"/scaleupset_",trans,"_",correction,".pdf"),width=spec_width,height=spec_height2)
+
+upset(fromList(lefse_list),order.by="freq",nsets=7,text.scale=2,mainbar.y.max =spec_max)
 
 # upset(fromList(lefse_list),order.by="freq",nsets=length(study_names),
 #       mainbar.y.max = 60)
 dev.off()
-# trans = "rel"
-# correction = "uncorrected"
+
+
+
 # lefse_list = readRDS(paste0(data_dir ,"/upset_",trans,"_",correction,".rds"))
 # pdf(paste0(data_dir ,"/upset_",trans,"_",correction,".pdf"))
 # upset(fromList(lefse_list),order.by="freq",nsets=length(study_names),mainbar.y.max = 250)
