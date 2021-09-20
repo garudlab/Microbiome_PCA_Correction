@@ -1,0 +1,5 @@
+# ignore all logs
+.*_*
+
+# ignore my inventory files
+Inventory.xlsx

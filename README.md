@@ -5,6 +5,22 @@
 
 Correction > transformations.R
 
+```
+Rscript transformations.R ~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 rds
+```
+Example output:
+
+```
+[1] "Starting CLR transformation of data"
+[1] "Adding pseudocount to zeroes"
+[1] 6.748107e-06
+[1] "Number of zero values in data"
+[1] 0
+[1] "Proportion of values in data that are zero"
+[1] 0
+[1] "Transformation done and exported to /Users/leahbriscoe/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5"
+```
+
 ### Step 2: Calculate PCs (if doing PCA correction)
 
 Correction > calc_pcs.R

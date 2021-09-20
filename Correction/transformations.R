@@ -1,26 +1,36 @@
+## example: run inside Corrections Folder
+# Rscript transformations.R ~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 rds
+
 args = commandArgs(trailingOnly=TRUE)
-print(args)
-
+data_dir = args[1] #~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 
+format = args[2] #rds
 require(compositions)
-main_dir ="/u/home/b/briscoel/project-halperin/MicroBatch/data/"
-script_folder= "/u/home/b/briscoel/project-halperin/MicroBatch/RevisionSequence/"
 
-folder =args[1] #"AGPr_max_k6" #  "AGPr_complete_otu"  #
-data_dir = paste0(main_dir,folder,"/")
-metadata_table = read.csv(paste0(data_dir,"metadata.txt"), sep = "\t",stringsAsFactors = FALSE,header=TRUE,row.names=1)
-feature_table =  readRDS(paste0(data_dir,"feature_table_rel.rds"))
-source(paste0(script_folder,"/correction_source.R"))
+#data_dir = "~/DocumentsMicroBatch/microbatch_vc/data/Gibbonsr_max_k5"
+metadata_table = read.csv(paste0(data_dir,"/metadata.txt"), sep = "\t",stringsAsFactors = FALSE,header=TRUE,row.names=1)
+if(format == "rds"){
+  feature_table =  readRDS(paste0(data_dir,"/feature_table_rel.rds"))
+  
+}else{
+  feature_table =  read.csv(paste0(data_dir,"/feature_table_rel.txt"), sep = "\t",stringsAsFactors = FALSE,header=TRUE,row.names=1)
+}
+source(paste0("correction_source.R"),local=TRUE)
 
 ##Replace 0 with pseudocount
+print("Starting CLR transformation of data")
 pseudocount  = min(feature_table[feature_table!= 0])*0.65
-print("pseudo")
-print(pseudocount)
-print("sum zero and zero prop")
+
+
 num_zero = sum(feature_table == 0)
 prop_zero = num_zero/(dim(feature_table)[1] * dim(feature_table)[2])
-print(num_zero)
-print(prop_zero)
+
+print("Adding pseudocount to zeroes")
 feature_table[feature_table == 0] = pseudocount
+print(pseudocount)
+print("Number of zero values in data" )
+print(num_zero)
+print("Proportion of values in data that are zero" )
+print(prop_zero)
 feature_table = t(clr(t(feature_table)))
 feature_table = data.frame(feature_table)
 feature_table = as.matrix(feature_table)
@@ -32,4 +42,4 @@ feature_table = t(scale_custom(t(feature_table)))
 
 saveRDS(feature_table,paste0(data_dir,"/feature_table_rel_clr_scale.rds"))
 write.table(feature_table,paste0(data_dir,"/feature_table_rel_clr_scale.txt"),sep="\t",quote=FALSE)
-
+print(paste0("Transformation done and exported to ", data_dir))

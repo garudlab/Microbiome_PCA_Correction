@@ -3,10 +3,10 @@ local = TRUE
 
 require(dplyr)
 if(local){
-  args = c("AGPr_complete_otu","rel","False","pearson")
+  args = c("Kaplanr_complete_otu","rel","True","pearson")
   
 }
-dtype_pca = "counts"
+dtype_pca = ""
 margins_list = list()
 margins_list[["Gibbonsr_complete_otu"]] =c(16,17)
 margins_list[["Thomasr_complete_otu"]] =c(13,15)
@@ -224,11 +224,14 @@ custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#72C1FC","#
 p <- ggboxplot(to_plot, x = "Var1", y = "value",
                fill = "Var1", palette = custom_colors) +xlab("Correction") + 
   
-  #stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#86B78F",vjust=1) + 
+  #stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#808080",vjust=1,method.args = list(alternative = "less")) +
   stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#e32f27",
-                     method.args = list(alternative = "greater"),hide.ns=TRUE) + 
+                     method.args = list(alternative = "greater"),hide.ns=TRUE) +
   stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#808080",
-                     method.args = list(alternative = "less"),hide.ns=TRUE) + 
+                     method.args = list(alternative = "less"),hide.ns=TRUE) +
+  #stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#86B78F",vjust=1,method.args = list(alternative = "greater")) +
+  # stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#808080",method.args = list(alternative = "greater"))+
+
   theme(text = element_text(size=13))+
    ylab(paste0("Cross-validated " , meas) ) + 
   theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=18),legend.position = "none",

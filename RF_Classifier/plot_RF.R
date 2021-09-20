@@ -3,7 +3,7 @@ local = TRUE
 
 require(dplyr)
 if(local){
-  args = c("AGPr_max_k5","rel","False","AUC")
+  args = c("Thomasr_complete_otu","rel","True","AUC")
   
 }
 dtype_pca = "counts"
@@ -78,10 +78,10 @@ data_dir = paste0(main_dir,folder,"/")
 # "bmc", "combat", "percentilenorm", "limma", "DCC", a
 #pca_methods = c(paste0("clr_pca",c(1,2,3,4,5,33),dtype_pca)) #,paste0("clr_pca",c(1:5)))
 
-pca_methods = c(paste0(extra_trans,"pca",c(3,33),dtype_pca)) #,paste0("clr_pca",c(1:5)))
+pca_methods = c(paste0(extra_trans,"pca",c(1,2,3,4,5,33),dtype_pca)) #,paste0("clr_pca",c(1:5)))
 #   c("clr_scale_pca",
 # "clr_pca1roundcounts", "clr_pca1", "clr_pca2roundcounts", "clr_pca2", "clr_pca3roundcounts", "clr_pca3")
-other_methods = c("nocorrection","DCC","combat","limma","bmc","clr") #,"logCPM","vsd" ) # , 
+other_methods = c("nocorrection","DCC","combat","limma","bmc","clr","logCPM","vsd" ) # , 
 corrections_vec = c(other_methods, pca_methods)
 trans_methods = rep(trans,length(corrections_vec))
 #trans_methods[(length(trans_methods)-5): length(trans_methods)] = "vsd"
@@ -191,7 +191,15 @@ if(lodo == "False"){
   input_str = apply(input,2, function(x){sprintf("%.2f",round(x,2))})
   pdf(paste0(data_dir,"/",meas,"_Heatmap_",trans, ".pdf"))
   heatmap.2(input, trace="none", density="none", col=colorRampPalette(c("red", "yellow")), cexRow=1, cexCol=1, margins = c(5,13),
-            Rowv = FALSE, Colv =  "Rowv",cellnote=input_str,notecol="black")
+            Rowv = FALSE, Colv =  "Rowv",cellnote=input_str,notecol="black") + 
+    stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#e32f27",
+                       method.args = list(alternative = "greater"),hide.ns=TRUE) + 
+    stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#808080",
+                       method.args = list(alternative = "less"),hide.ns=TRUE) + 
+    stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#86B78F",vjust=1,method.args = list(alternative = "greater")) +
+    stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#808080",vjust=1,method.args = list(alternative = "less"))
+    
+    
   dev.off()
 }
 
