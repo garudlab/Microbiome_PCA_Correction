@@ -1,3 +1,4 @@
+# Rename Gibbons data
 
 data_dir ="/Users/leahbriscoe/Documents/MicroBatch/microbatch_vc/data/"
 
