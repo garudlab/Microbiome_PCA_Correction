@@ -1,5 +1,6 @@
 # ignore all logs
-.*_*
+.DS_Store
+.ipynb_checkpoints
 
 # ignore my inventory files
-Inventory.xlsx
+/Inventory.xlsx
