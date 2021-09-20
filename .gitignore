@@ -4,3 +4,5 @@
 
 # ignore my inventory files
 /Inventory.xlsx
+/Accessory
+/Accessory/*
