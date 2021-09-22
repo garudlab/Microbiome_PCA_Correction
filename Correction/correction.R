@@ -1,3 +1,18 @@
+
+
+## example: run inside Corrections Folder
+## example: run from main director (Microbiome_PCA_Correction)
+# Rscript Correction/calc_pcs.R ~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 rel_clr
+
+args = commandArgs(trailingOnly=TRUE)
+data_dir = args[1] #~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 
+transformation = args[2] #rds
+
+# FUNCTIONS
+source(paste0("Correction/correction_source.R"))
+
+
+########
 args = commandArgs(trailingOnly=TRUE)
 local = FALSE
 round_time = FALSE
@@ -27,8 +42,7 @@ data_dir = paste0(main_dir,folder,"/")
 metadata_table = read.csv(paste0(data_dir,"metadata.txt"), sep = "\t",stringsAsFactors = FALSE,header=TRUE,row.names=1)
 feature_table =  readRDS(paste0(data_dir,"feature_table_",trans,".rds"))
 
-# FUNCTIONS
-source(paste0(script_folder,"/correction_source.R"))
+
 
 if(folder == "Thomasr_complete_otu"){
   dataset_batch = metadata_table$dataset_name

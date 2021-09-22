@@ -1,20 +1,18 @@
-## example: run inside Corrections Folder
-# Rscript transformations.R ~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 rds
+## example: run from main director (Microbiome_PCA_Correction)
+# Rscript Correction/transformations.R ~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 rds
 
 args = commandArgs(trailingOnly=TRUE)
 data_dir = args[1] #~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 
 format = args[2] #rds
 require(compositions)
 
-#data_dir = "~/DocumentsMicroBatch/microbatch_vc/data/Gibbonsr_max_k5"
-metadata_table = read.csv(paste0(data_dir,"/metadata.txt"), sep = "\t",stringsAsFactors = FALSE,header=TRUE,row.names=1)
 if(format == "rds"){
   feature_table =  readRDS(paste0(data_dir,"/feature_table_rel.rds"))
   
 }else{
   feature_table =  read.csv(paste0(data_dir,"/feature_table_rel.txt"), sep = "\t",stringsAsFactors = FALSE,header=TRUE,row.names=1)
 }
-source(paste0("correction_source.R"),local=TRUE)
+source(paste0("Correction/correction_source.R"),local=FALSE)
 
 ##Replace 0 with pseudocount
 print("Starting CLR transformation of data")
