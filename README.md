@@ -9,7 +9,7 @@ Preprint of the paper can be found on [biorxiv](https://www.biorxiv.org/content/
 
 
 
-##<a name =quick> Quick summary of steps </a>
+## <a name =quick> Quick summary of steps </a>
 
 ### Needed input data:
 
