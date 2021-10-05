@@ -6,109 +6,79 @@
 
 args = commandArgs(trailingOnly=TRUE)
 data_dir = args[1] #~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 
-transformation = args[2] #rds
-
+format = args[2]
+transformation = args[3] #rel_clr
+correction = args[4] #limma
+batch_column = args[5]
+phenotype_column = args[6]
 # FUNCTIONS
 source(paste0("Correction/correction_source.R"))
 
 
 ########
-args = commandArgs(trailingOnly=TRUE)
-local = FALSE
 round_time = FALSE
 require(dplyr)
-if(local){
-  args = c("Thomasr_complete_otu","rel",2,"limma")
-  
-}
-
 print(args)
 
-main_dir ="/u/home/b/briscoel/project-halperin/MicroBatch/data/"
-script_folder= "/u/home/b/briscoel/project-halperin/MicroBatch/RevisionSequence/"
-
-if(local){
-  main_dir ="/Users/leahbriscoe/Documents/MicroBatch/microbatch_vc/data/"
-  script_folder= "/Users/leahbriscoe/Documents/MicroBatch/microbatch_vc/RevisionSequence/"
+if(format == "rds"){
+  feature_table =  readRDS(paste0(data_dir,"/feature_table_",transformation,".rds"))
   
+}else{
+  feature_table =  read.csv(paste0(data_dir,"/feature_table_",transformation,".txt"), sep = "\t",stringsAsFactors = FALSE,header=TRUE,row.names=1)
 }
+metadata_table = read.csv(paste0(data_dir,"/metadata.txt"), sep = "\t",stringsAsFactors = FALSE,header=TRUE,row.names=1)
 
-folder = args[1] # "AGPr_max_k5" #"AGPr_complete_otu" 
-trans = args[2] #"rel"
-num_pcs_regress = as.integer(args[3])
-correction= args[4] #"rel"
-
-data_dir = paste0(main_dir,folder,"/")
-metadata_table = read.csv(paste0(data_dir,"metadata.txt"), sep = "\t",stringsAsFactors = FALSE,header=TRUE,row.names=1)
-feature_table =  readRDS(paste0(data_dir,"feature_table_",trans,".rds"))
-
-
-
-if(folder == "Thomasr_complete_otu"){
-  dataset_batch = metadata_table$dataset_name
-  dataset_phenotype = metadata_table$bin_crc_normal
-  
-}
-
-if(grepl("Kaplan",folder)){
-  #dataset_batch = metadata_table$mastermix_lot..exp.
-  
-  dataset_batch = metadata_table$extraction_robot..exp.
-  dataset_phenotype = metadata_table$diabetes_self_v2
-  
-}
-
-if(grepl("Thomasr_max_",folder)){
-  dataset_batch = metadata_table$dataset_name
-  
-  new_pheno = sapply(metadata_table$bin_crc_normal,function(x){
-    if(is.na(x)){return(NA)}
-    if(x == "CRC"){return(1)}
-    if(x == "H"){return(0)}
+if(length(args) >= 5){
+  dataset_batch = metadata_table[,batch_column]
+  dataset_phenotype = metadata_table[,phenotype_column]
+}else{
+  if(grepl("Thomasr_complete_otu",data_dir)){
+    dataset_batch = metadata_table$dataset_name
+    dataset_phenotype = metadata_table$bin_crc_normal
+  }else if(grepl("Kaplan",folder)){
+    dataset_batch = metadata_table$extraction_robot..exp.
+    dataset_phenotype = metadata_table$diabetes_self_v2
+  }else if(grepl("Thomasr_max_",folder)){
+    dataset_batch = metadata_table$dataset_name
+    new_pheno = sapply(metadata_table$bin_crc_normal,function(x){
+      if(is.na(x)){return(NA)}
+      if(x == "CRC"){return(1)}
+      if(x == "H"){return(0)}
+    })
+    metadata_table$bin_crc_normal = new_pheno
+    dataset_phenotype = metadata_table$bin_crc_normal
     
-  })
-  metadata_table$bin_crc_normal = new_pheno
-  dataset_phenotype = metadata_table$bin_crc_normal
-  
-}
-
-if(grepl("AGP",folder)){
-  new_pheno = sapply(metadata_table$bin_antibiotic_last_year,function(x){
-    if(is.na(x)){return(NA)}
-    if(x == "Yes"){return(1)}
-    if(x == "No"){return(0)}
+  }else if(grepl("AGP",folder)){
+    new_pheno = sapply(metadata_table$bin_antibiotic_last_year,function(x){
+      if(is.na(x)){return(NA)}
+      if(x == "Yes"){return(1)}
+      if(x == "No"){return(0)}
+      
+    })
+    metadata_table$bin_antibiotic_last_year = new_pheno
     
-  })
-  metadata_table$bin_antibiotic_last_year = new_pheno
-  
-  dataset_batch = metadata_table$Instrument
-  dataset_phenotype = metadata_table$bin_antibiotic_last_year
-  
-}
-
-if(folder == "Gibbonsr_complete_otu"){
-  
-  new_pheno = sapply(metadata_table$bin_crc_normal,function(x){
-    if(is.na(x)){return(NA)}
-    if(x == "CRC"){return(1)}
-    if(x == "H"){return(0)}
+    dataset_batch = metadata_table$Instrument
+    dataset_phenotype = metadata_table$bin_antibiotic_last_year
     
-  })
-  metadata_table$bin_crc_normal = new_pheno
-  
-  dataset_batch = metadata_table$study
-  dataset_phenotype = metadata_table$bin_crc_normal
-  
+  }else if(grepl( "Gibbonsr_complete_otu",data_dir)){
+    
+    new_pheno = sapply(metadata_table$bin_crc_normal,function(x){
+      if(is.na(x)){return(NA)}
+      if(x == "CRC"){return(1)}
+      if(x == "H"){return(0)}
+      
+    })
+    metadata_table$bin_crc_normal = new_pheno
+    
+    dataset_batch = metadata_table$study
+    dataset_phenotype = metadata_table$bin_crc_normal
+    
+  }else if(grepl("Gibbonsr_max", folder)){
+    dataset_batch = metadata_table$study
+    dataset_phenotype = metadata_table$bin_crc_normal
+    
+  }
 }
-if(grepl("Gibbonsr_max", folder)){
-  dataset_batch = metadata_table$study
-  dataset_phenotype = metadata_table$bin_crc_normal
-  
-  print(table(dataset_batch))
-  
-}
-
-
 
 
 
@@ -120,7 +90,7 @@ if(correction == "pca"){
   feature_table_orig = feature_table
   num_pcs_calc = 15
   
-  pca_score = readRDS(paste0(data_dir,"/pca_score_", trans,".rds"))
+  pca_score = readRDS(paste0(data_dir,"/pca_score_", transformation,".rds"))
   
   print(dim(pca_score))
   print(dim(feature_table))
@@ -134,13 +104,13 @@ if(correction == "pca"){
   
   if(round_time){
     feature_table_counts = round(feature_table_counts,5)
-    saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"roundcounts.rds"))
-    write.table(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"roundcounts.txt"),sep="\t",quote=FALSE)
+    saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"roundcounts.rds"))
+    write.table(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"roundcounts.txt"),sep="\t",quote=FALSE)
     
   }else{
     
-    saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"counts.rds"))
-    write.table(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"counts.txt"),sep="\t",quote=FALSE)
+    saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"counts.rds"))
+    write.table(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"counts.txt"),sep="\t",quote=FALSE)
     
   }
  
@@ -162,8 +132,8 @@ if(correction == "DCC"){
   feature_table = correct_DCC(mat = feature_table,batch_labels = dataset_batch)
   #feature_table_counts = exp(feature_table) #, t(feature_table_orig))
   
-  #saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"counts.rds"))
-  #write.table(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"counts.txt"),sep="\t",quote=FALSE)
+  #saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"counts.rds"))
+  #write.table(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"counts.txt"),sep="\t",quote=FALSE)
   
 }
 
@@ -175,11 +145,11 @@ if(correction == "combat"){
   if(round_time){
     
     feature_table_counts = round(feature_table_counts,5)
-    saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"roundcounts.rds"))
-    write.table(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"roundcounts.txt"),sep="\t",quote=FALSE)
+    saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"roundcounts.rds"))
+    write.table(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"roundcounts.txt"),sep="\t",quote=FALSE)
   }else{
-    saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"counts.rds"))
-    write.table(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"counts.txt"),sep="\t",quote=FALSE)
+    saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"counts.rds"))
+    write.table(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"counts.txt"),sep="\t",quote=FALSE)
     
   }
 }
@@ -189,12 +159,12 @@ if(correction == "limma"){
   feature_table_counts = exp(feature_table) #, t(feature_table_orig))
   if(round_time){
     feature_table_counts = round(feature_table_counts,5)
-    saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"roundcounts.rds"))
-    write.table(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"roundcounts.txt"),sep="\t",quote=FALSE)
+    saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"roundcounts.rds"))
+    write.table(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"roundcounts.txt"),sep="\t",quote=FALSE)
     
   }else{
-    saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"counts.rds"))
-    write.table(feature_table_counts,paste0(data_dir,"/feature_table_",trans,"_",correction,"counts.txt"),sep="\t",quote=FALSE)
+    saveRDS(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"counts.rds"))
+    write.table(feature_table_counts,paste0(data_dir,"/feature_table_",transformation,"_",correction,"counts.txt"),sep="\t",quote=FALSE)
     
   }
   
@@ -208,5 +178,5 @@ if(correction == "bmc"){
   #print(intersect(colnames(feature_table))
   feature_table = correct_bmc(mat = feature_table,batch_labels = dataset_batch)
 }
-saveRDS(feature_table,paste0(data_dir,"/feature_table_",trans,"_",correction,".rds"))
-write.table(feature_table,paste0(data_dir,"/feature_table_",trans,"_",correction,".txt"),sep="\t",quote=FALSE)
+saveRDS(feature_table,paste0(data_dir,"/feature_table_",transformation,"_",correction,".rds"))
+write.table(feature_table,paste0(data_dir,"/feature_table_",transformation,"_",correction,".txt"),sep="\t",quote=FALSE)
