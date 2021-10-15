@@ -1,13 +1,31 @@
 # Code to implement analyses of PCA correction and other corrections in Microbiome data 
 
-Preprint of the paper can be found on [biorxiv](https://www.biorxiv.org/content/10.1101/2021.03.19.436199v1)
+The code in this repository can be followed in order to reproduce the analyses in the preprint found on [biorxiv](https://www.biorxiv.org/content/10.1101/2021.03.19.436199v1). 
 
 
 ## Table of contents
+1. [Needed packages](#packages)
 1. [Quick summary of steps](#quick)
 2. [Breakdown of steps and expected output](#breakdown)
 
 
+## <a name =packages> Needed packages </a>
+
+```
+packs = c("compositions")
+lapply(packs,install.packages())
+
+```
+
+if also testing edgeR and DESeq2
+
+```
+if (!requireNamespace("BiocManager", quietly = TRUE))
+  install.packages("BiocManager")
+
+BiocManager::install("edgeR")
+BiocManager::install("DESeq2")
+```
 
 ## <a name =quick> Quick summary of steps </a>
 

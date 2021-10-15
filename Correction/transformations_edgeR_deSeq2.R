@@ -48,7 +48,6 @@ dim(logcpm)
 feature_table_logcpm = as.matrix(logcpm)
 range(feature_table)
 feature_table_vsd <- as.matrix(varianceStabilizingTransformation(as.matrix(feature_table)))
-dds <- makeExampleDESeqDataSet(m=6)
 
 # 
 saveRDS(feature_table_logcpm ,paste0(data_dir,"/feature_table_logCPM.rds"))
