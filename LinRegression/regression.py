@@ -7,8 +7,8 @@
 # python classifier.py --folder Thomasr_complete_otu --trans rel --correction nocorrection --lodo 1 --phenotype bin_crc_normal --n_estimators 100 --criterion entropy --max_depth 1 --min_samples_split 5 --min_samples_leaf 1 --max_features 0.1
 # python classifier.py --folder AGPr_max_k5 --trans rel --correction clr_pca2counts --lodo 0 --phenotype bin_antibiotic_last_year --n_estimators 100 --criterion entropy --max_depth 1 --min_samples_split 5 --min_samples_leaf 1 --max_features 0.1
 
-# python regression.py --folder AGPr_max_k5 --trans rel --correction nocorrection --lodo 0 --phenotype bmi_corrected 
-# python regression.py --folder Kaplanr_max_k5 --trans rel --correction nocorrection --lodo 1 --phenotype bmi_v2 
+# python regression.py --folder AGPr_max_k5 --trans vst --correction nocorrection --lodo 1 --phenotype bmi_corrected 
+# python regression.py --folder Kaplanr_max_k7 --trans vst --correction nocorrection --lodo 1 --phenotype bmi_v2 
 
 import argparse,sys
 
@@ -35,7 +35,7 @@ if local:
 groups = {"AGPr_complete_otu":"Instrument","Thomasr_complete_otu":"dataset_name","AGPr_max_k7":"Instrument", "AGPr_max_k5":"Instrument", \
 "AGPr_max_k6":"Instrument", "Gibbonsr_complete_otu":"study", "Thomasr_max_k6":"dataset_name","Thomasr_max_k7":"dataset_name",\
  "Gibbonsr_max_k5":"study", "Gibbonsr_max_k6":"study", "Gibbonsr_max_k7":"study","Gibbonsr_max_k8":"study", "Kaplanr_complete_otu": "extraction_robot..exp.",
- "Kaplanr_max_k6": "extraction_robot..exp.",'Kaplanr_max_k5':"extraction_robot..exp."}
+ "Kaplanr_max_k6": "extraction_robot..exp.",'Kaplanr_max_k5':"extraction_robot..exp.",'Kaplanr_max_k7':"extraction_robot..exp.",'Kaplanr_max_k8':"extraction_robot..exp."}
 
 parser.add_argument('--folder', help='Name of dataset folder',type=str)
 parser.add_argument('--trans', help='Which transformation of data',type=str)

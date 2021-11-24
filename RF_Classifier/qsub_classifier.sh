@@ -34,7 +34,7 @@ for nest in 100 1000 1500;
 						do 
 							COUNTER=$((COUNTER + 1)); 
 							echo $COUNTER; 
-							echo "$dataset_input $rel $corr_input $lodo_input $phen_input $nest $crit $maxd $miss $misl $maf" > inputs/data_$COUNTER.in; 	
+							echo "$dataset_input $rel $corr_input $lodo_input $phen_input $nest $crit $maxd $miss $misl $maf" > /u/home/b/briscoel/project-halperin/MicroBatch/RevisionSequence/RF_Classifier/inputs/data_$COUNTER.in; 	
 
 						done;
 					done; 
@@ -58,7 +58,11 @@ elif [[ "$dataset_input" == *"AGPr_max_k7"* ]] ; then
 
 elif [[ "$dataset_input" == *"AGPr_"* ]]; then
 	echo "$first_count_input:$COUNTER"
-	qsub -cwd -V -o misc -e misc -N RF -l h_data=18G,time=48:00:00,highp -b y -t $first_count_input:$COUNTER "./run_classifier.sh"
+	qsub -cwd -V -o misc -e misc -N RF -l h_data=20G,time=24:00:00 -b y -t $first_count_input:$COUNTER "./run_classifier.sh"
+
+elif [[ "$dataset_input" == *"Gibbons"* ]]; then
+	echo "$first_count_input:$COUNTER"
+	qsub -cwd -V -o misc -e misc -N RF -l h_data=4G,time=24:00:00 -b y -t $first_count_input:$COUNTER "./run_classifier.sh"
 
 elif [[ "$dataset_input" == *"k5"* ]]; then
 	echo "$first_count_input:$COUNTER"
@@ -67,7 +71,7 @@ elif [[ "$dataset_input" == *"k5"* ]]; then
 
 elif [[ "$dataset_input" == *"k7"* ]]; then
 	echo "$first_count_input:$COUNTER"
-	qsub -cwd -V -o misc -e misc -N RF -l h_data=16G,time=24:00:00,highp -b y -t $first_count_input:$COUNTER "./run_classifier.sh"
+	qsub -cwd -V -o misc -e misc -N RF -l h_data=16G,time=24:00:00 -b y -t $first_count_input:$COUNTER "./run_classifier.sh"
 
 
 elif [[ "$dataset_input" == *"k8"* ]]; then
@@ -76,7 +80,7 @@ elif [[ "$dataset_input" == *"k8"* ]]; then
 
 elif [[ "$dataset_input" == *"k6"* ]]; then
 	echo "$first_count_input:$COUNTER"
-	qsub -cwd -V -o misc -e misc -N RF -l h_data=14G,time=24:00:00,highp -b y -t $first_count_input:$COUNTER "./run_classifier.sh"
+	qsub -cwd -V -o misc -e misc -N RF -l h_data=14G,time=24:00:00 -b y -t $first_count_input:$COUNTER "./run_classifier.sh"
 
 elif [[ "$dataset_input" == *"otu"* ]]; then
 	echo "$first_count_input:$COUNTER"

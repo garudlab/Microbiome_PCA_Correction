@@ -48,9 +48,19 @@ if local:
 
 studies_dict = {"Thomasr_complete_otu": ['FengQ_2015','HanniganGD_2017', 'ThomasAM_2018a', 'ThomasAM_2018b', 'VogtmannE_2016', 'YuJ_2015', 'ZellerG_2014'],
 "Thomasr_max_k6": ['FengQ_2015','HanniganGD_2017', 'ThomasAM_2018a', 'ThomasAM_2018b', 'VogtmannE_2016', 'YuJ_2015', 'ZellerG_2014'],
+"Thomasr_max_k7": ['FengQ_2015','HanniganGD_2017', 'ThomasAM_2018a', 'ThomasAM_2018b', 'VogtmannE_2016', 'YuJ_2015', 'ZellerG_2014'],
 "Gibbonsr_complete_otu": ["crc_zeller","crc_baxter","crc_zackular"],
+"Gibbonsr_max_k5": ["crc_zeller","crc_baxter","crc_zackular"],
+"Gibbonsr_max_k6": ["crc_zeller","crc_baxter","crc_zackular"],
+"Gibbonsr_max_k7": ["crc_zeller","crc_baxter","crc_zackular"],
+"Gibbonsr_max_k8": ["crc_zeller","crc_baxter","crc_zackular"],
 "Kaplanr_complete_otu": ["HOWE_KF1", "HOWE_KF2", "HOWE_KF3", "HOWE_KF4"],
-"Kaplanr_max_k6": ["HOWE_KF1", "HOWE_KF2", "HOWE_KF3", "HOWE_KF4"]}
+"Kaplanr_max_k6": ["HOWE_KF1", "HOWE_KF2", "HOWE_KF3", "HOWE_KF4"],
+"AGPr_complete_otu": ['Illumina MiSeq', 'Illumina HiSeq 2500','Illumina HiSeq 2000'],
+"AGPr_max_k5": ['Illumina MiSeq', 'Illumina HiSeq 2500','Illumina HiSeq 2000'],
+"AGPr_max_k6": ['Illumina MiSeq', 'Illumina HiSeq 2500','Illumina HiSeq 2000'],
+"AGPr_max_k7": ['Illumina MiSeq', 'Illumina HiSeq 2500','Illumina HiSeq 2000'],
+"AGPr_max_k8": ['Illumina MiSeq', 'Illumina HiSeq 2500','Illumina HiSeq 2000']}
 data_dir = main_dir + folder + "/"
 out_dir = data_dir + "RF/"
 
@@ -107,12 +117,21 @@ final_metrics = pd.DataFrame(columns=["fold", "nest", "crit","maxd","miss","misl
 print(metrics_dict)
 
 for k in metrics_dict.keys():
+
+	print("k")
+	print(k)
 	print("max")
 	print(max(list(metrics_dict[k][meas])))
 	best_model_index = list(metrics_dict[k][meas]).index(max(list(metrics_dict[k][meas])))
 	temp = metrics_dict[k].iloc[best_model_index]
+
+	#print("temp")
+	#print(temp)
 	#temp.insert(0,"fold",k, True)
-	temp.set_value("fold",k)
+	#temp.set_value("fold",k)
+	temp.at["fold"]=k
+
+	#print(temp)
 	final_metrics = final_metrics.append(temp)
 
 

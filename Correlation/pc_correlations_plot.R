@@ -2,14 +2,13 @@ args = commandArgs(trailingOnly=TRUE)
 local = TRUE
 if(local){
   #args = c("Thomasr_max_k6","rel_clr","dataset_name") #
-  #args = c("Thomasr_complete_otu","logCPM","study_condition") #
-  #args = c("Gibbonsr_complete_otu","rel","bin_crc")
-  #args = c("Gibbonsr_complete_otu","rel_clr","study")
-  args = c("Gibbonsr_max_k6","rel","study")
-  #args = c("AGPr_complete_otu","rel_clr","Instrument") #bin_antibiotic_last_year
+  args = c("Thomasr_complete_otu","rel_clr","dataset_name") #
+  #args = c("Gibbonsr_complete_otu","rel","study")
+  #args = c("Gibbonsr_max_k6","rel","study")
+  #args = c("AGPr_complete_otu","rel","Instrument") #bin_antibiotic_last_year
   #args = c("AGPr_max_k6","rel","Instrument") #bin_antibiotic_last_year
   #args = c("Kaplanr_complete_otu","rel","extraction_robot..exp.") #bin_antibiotic_last_year
-  #args = c("Kaplanr_max_k6","rel_clr","extraction_robot..exp.") #bin_antibiotic_last_year
+  #args = c("Kaplanr_max_k6","rel","extraction_robot..exp.") #bin_antibiotic_last_year
 }
 
 print(args)
@@ -31,7 +30,7 @@ data_dir = paste0(main_dir,folder,"/")
 metadata_table = read.csv(paste0(data_dir,"metadata.txt"), sep = "\t",stringsAsFactors = FALSE,header=TRUE,row.names=1)
 
 # FUNCTIONS
-source(paste0(script_folder,"/correction_source.R"))
+source(paste0(script_folder,"Correction/correction_source.R"))
 
 
 
@@ -52,13 +51,104 @@ print(dim(metadata_table))
 #pca_score = pca_score[!is.na(metadata_table[,group_column]),]
 #metadata_table = metadata_table[!is.na(metadata_table[,group_column]),]
 dev.off()
+
+
 metadata_table[,group_column] = gsub("_"," ",metadata_table[,group_column])
+#metadata_table[,group_column] <- factor(metadata_table[,group_column],levels = c("Illumina MiSeq","Illumina HiSeq 2000","Illumina HiSeq 2500"       ))
+table(metadata_table[,group_column])
 p <- pca_plot(pca_score,metadata_table, title = "PC 1 and 2",group_column=group_column,coord1=1,coord2=2)
 #p <- p + ylim(-20,10)
 #p <- p + xlim(-0.3,0)
 p
-
 ggsave(p,file=paste0(data_dir,"/pca_plot_",trans, "_", group_column,".pdf"),device ="pdf")
+
+saveRDS(p,paste0(data_dir,"/pca_plot_",trans, "_", group_column,".rds"))
+
+if(grepl("Gibbonsr_max_k",folder ) ){
+  group_column2 = "DiseaseState"
+  
+  metadata_table$DiseaseState =metadata_table$bin_crc_normal
+  
+  
+  metadata_table[,group_column2] = sapply( metadata_table$DiseaseState,function(x){
+    if(is.na(x)){
+      return(NA)
+    }else if(x == 1){
+      return("CRC")
+    }else if(x ==0){
+      return("H")
+    }else if(x == ""){
+      return(NA)
+    }else{
+      return(NA)
+    }
+  })
+}else if(grepl("Thomasr_com",folder )){
+  group_column2 = "DiseaseState"
+  metadata_table[,group_column2]  = sapply( metadata_table$disease,function(x){
+    if(is.na(x)){
+      return(NA)
+    }else if(x == "CRC"){
+      return("CRC")
+    }else if(x=="healthy"){
+      return("H")
+    }else if(x=="adenoma"){
+      return("Adenoma")
+    }else{
+      return(NA)
+    }
+  })
+  
+  
+}else if(grepl("Thomasr_max",folder ) ){
+  group_column2 = "DiseaseState"
+  
+  metadata_table$DiseaseState = metadata_table$multi_crc_adenoma_normal
+  
+}else if(grepl("Gibbonsr_c",folder )){
+  group_column2 = "DiseaseState"
+  metadata_table[,group_column2] = sapply( metadata_table$DiseaseState,function(x){
+    if(is.na(x)){
+      return(NA)
+    }else if(x == ""){
+      return(NA)
+    }else if(x == "nonCRC"){
+      return("Adenoma")
+    }else{
+      return(x)
+    }
+  })
+}else if(grepl("AGPr",folder )){
+  group_column2 = "bin_antibiotic_last_year"
+}else if (grepl("Kaplanr_",folder)){
+  group_column2 = "bmi_group_HOW"
+  
+  new_pheno = sapply(metadata_table[,"bmi_v2"],function(x){
+    if(is.na(x)){return(NA)}
+    else if(x %in% c("not provided","not applicable","Not provided","Unspecified","")){return(NA)}
+    else{
+      #print(x)
+      num_x = as.numeric(x)
+      if((num_x < 25) & (num_x > 18.5)){
+        return("Healthy")
+      }else if((num_x > 30) & (num_x < 35)){
+        return("Overweight")
+      }else{
+        return(NA)
+      }
+    }
+    
+  })
+  metadata_table[,group_column2] = new_pheno
+}
+p <- pca_plot(pca_score,metadata_table, title = "PC 1 and 2",group_column=group_column2,coord1=1,coord2=2)
+#p <- p + ylim(-20,10)
+#p <- p + xlim(-0.3,0)
+p
+#table(metadata_table$DiseaseState)
+ggsave(p,file=paste0(data_dir,"/pca_plot_",trans, "_", group_column2,".pdf"),device ="pdf")
+
+saveRDS(p,file=paste0(data_dir,"/pca_plot_",trans, "_", group_column2,".rds"))
 
 ### MAKE PCA COrrelation plot
 library(corrplot)

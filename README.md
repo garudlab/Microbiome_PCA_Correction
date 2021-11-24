@@ -70,6 +70,8 @@ Rscript Correction/calc_pcs.R ~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr
 
 ```
 Rscript Correction/correction.R ~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 rds rel limma study bin_crc_normal
+
+Rscript Correction/correction.R ~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 rds logcpm limma study bin_crc_normal
 ```
 
 ### Analysis Opt 1: Correlation analyses

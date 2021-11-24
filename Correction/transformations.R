@@ -2,9 +2,14 @@
 # Rscript Correction/transformations.R ~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 rds counts vst
 
 #on cluster
-# Rscript Correction/transformations.R /u/home/b/briscoel/project-halperin/MicroBatch/data/Gibbonsr_max_k5 rds counts vst
+#Rscript Correction/transformations.R /u/home/b/briscoel/project-halperin/MicroBatch/data/Kaplanr_complete_otu rds counts logcpm
 
+# Rscript Correction/transformations.R /u/home/b/briscoel/project-halperin/MicroBatch/data/Gibbonsr_max_k5 rds counts vst
+#args = c("~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k6" ,"rds", "counts", "vst")
+#args = c("~/Documents/MicroBatch/microbatch_vc/data/Kaplanr_complete_otu" ,"rds", "counts", "logcpm")
 args = commandArgs(trailingOnly=TRUE)
+print(args)
+
 data_dir = args[1] #~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 
 format = args[2] #rds
 trans = args[3]
@@ -30,11 +35,25 @@ if(format == "rds"){
 }else{
   feature_table =  read.csv(paste0(data_dir,"/feature_table",trans_string,".txt"), sep = "\t",stringsAsFactors = FALSE,header=TRUE,row.names=1)
 }
+# dim(feature_table)
+# sum(rowSums(feature_table) > 0)
+# hist(rowSums(feature_table),breaks=1000,xlim=c(0,100000),)
+# sum(rowVars(as.matrix(feature_table))> 0)
+
 source(paste0("Correction/correction_source.R"),local=FALSE)
 
 ##Replace 0 with pseudocount
 print("Starting CLR transformation of data")
-pseudocount  = min(feature_table[feature_table!= 0])*0.65
+
+## because integers are required for VST and logCPM
+
+if(correction_method  %in% c("logcpm","vst")){
+  pseudocount  = 1
+  
+}else{
+  pseudocount  = min(feature_table[feature_table!= 0])*0.65
+  
+}
 
 
 num_zero = sum(feature_table == 0)
@@ -67,6 +86,7 @@ if(correction_method  =="standard"){
   if(correction_method  =="logcpm"){
     y <- DGEList(counts=feature_table)
     keep <- filterByExpr(y)
+    #sum(keep)
     y <- y[keep,,keep.lib.sizes=FALSE]
     y <- calcNormFactors(y)
     
@@ -76,6 +96,10 @@ if(correction_method  =="standard"){
     feature_table <- as.matrix(varianceStabilizingTransformation(as.matrix(feature_table)))
     
   }
+
+ 
+  
+  #sum(is.na(feature_table))
   saveRDS(feature_table,paste0(data_dir,"/feature_table",trans_string,"_", correction_method,".rds"))
   write.table(feature_table,paste0(data_dir,"/feature_table",trans_string,"_", correction_method,".txt"),sep="\t",quote=FALSE)
   

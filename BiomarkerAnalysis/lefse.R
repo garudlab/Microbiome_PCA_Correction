@@ -10,9 +10,28 @@ require(dplyr)
 if(local){
   #args = c("Thomasr_complete_otu","rel","uncorrected")
   #args = c("Thomasr_complete_otu","rel_clr","pca4counts")
-  #args = c("Kaplanr_complete_otu","rel","uncorrected")
-  args = c("Kaplanr_complete_otu","rel_clr","pca2counts")
+  #args = c("Thomasr_complete_otu","rel_clr","pca3counts")
+  #args = c("Thomasr_complete_otu","rel","clr")
+  #args = c("Thomasr_complete_otu","rel","clr")
+  #args = c("Thomasr_complete_otu","rel","combatcounts")
+  #args = c("Thomasr_complete_otu","rel","limmacounts")
+  #args = c("Thomasr_complete_otu","rel","bmc")
+  #args = c("Thomasr_complete_otu","rel","DCC")
+  #args = c("Thomasr_complete_otu","counts","vst")
+  #args = c("Thomasr_complete_otu","counts","logcpm")
   
+  
+  #args = c("Kaplanr_complete_otu","rel","uncorrected")
+  #args = c("Kaplanr_complete_otu","rel_clr","pca2counts")
+  #args = c("Kaplanr_complete_otu","rel_clr","pca3counts")
+  #args = c("Kaplanr_complete_otu","rel","combatcounts")
+  #args = c("Kaplanr_complete_otu","rel","limmacounts")
+  args = c("Kaplanr_complete_otu","rel","bmc")
+  # args = c("Kaplanr_complete_otu","counts","vst")
+  #args = c("Kaplanr_complete_otu","counts","logcpm")
+  
+  #args = c("Kaplanr_complete_otu","rel","clr")
+  #args = c("Kaplanr_complete_otu","rel","DCC")
 }
 
 print(args)
@@ -38,7 +57,7 @@ if(correction == "uncorrected"){
 }else{
   feature_table =  readRDS(paste0(data_dir,"feature_table_",trans,"_", correction,".rds"))
 }
-
+dim(feature_table)
 
 require("compositions")
 
@@ -83,14 +102,24 @@ if(grepl("Thomas",folder)){
   metadata_table[,dataset_phenotype] = new_pheno
   
 }
+range(feature_table)
 
-
+dim(feature_table)
+feature_table[1:4,]
 taxonomy = read.csv("/Users/leahbriscoe/Documents/MicroBatch/microbatch_vc/data/97_otu_taxonomy.txt",
                     sep = "\t",header=FALSE)
 
 lefse_list = list()
 #for( s in 1:3){
 for( s in 1:length(study_names)){
+ 
+  if(correction == "logcpm"){
+    if(s == 1){
+      next
+    }else if (s == 4){
+      next
+    }
+  }
  
 
   study_name = study_names[s]
@@ -122,6 +151,7 @@ for( s in 1:length(study_names)){
   
   lefse_list[[study_name]] = final_names
 }
+range(feature_table)
 dim(feature_table)
 feature_table[1:4,1:4]
 #install.packages("UpSetR")
@@ -133,38 +163,6 @@ upset(fromList(lefse_list),order.by="freq",nsets=length(study_names))
 dev.off()
 
 saveRDS(lefse_list,paste0(data_dir ,"/upset_",trans,"_",correction,".rds"))
-
-# trans = "rel"
-# correction = "uncorrected"
-if(grepl("Kaplan",folder)){
-  spec_max = 60
-  spec_height = 9
-  spec_height2 = 4
-  spec_width=11
-  spec_text=4
-}else{
-  spec_text=3.5
-  spec_max = 250
-  spec_width = 12
-  spec_height = 10
-  spec_height2 = 10
-}
-lefse_list = readRDS(paste0(data_dir ,"/upset_",trans,"_",correction,".rds"))
-names(lefse_list) = gsub("_"," ",names(lefse_list))
-pdf(paste0(data_dir ,"/upset_",trans,"_",correction,".pdf"),width=spec_width,height=spec_height)
-
-upset(fromList(lefse_list),order.by="freq",nsets=7,text.scale=spec_text,
-      mainbar.y.max =spec_max,point.size=5,line.size=2)
-
-dev.off()
-
-pdf(paste0(data_dir ,"/scaleupset_",trans,"_",correction,".pdf"),width=spec_width,height=spec_height2)
-
-upset(fromList(lefse_list),order.by="freq",nsets=7,text.scale=2,mainbar.y.max =spec_max)
-
-# upset(fromList(lefse_list),order.by="freq",nsets=length(study_names),
-#       mainbar.y.max = 60)
-dev.off()
 
 
 
@@ -184,7 +182,7 @@ for( l in 1:length(lefse_list)){
       }else{
         get_intersection[[x]] = 1
       }
-    
+      
     }
   }
   
@@ -194,3 +192,47 @@ for( l in 1:length(lefse_list)){
 sum(get_intersection > 1)
 sum(get_intersection > 2)
 sum(get_intersection > 3)
+sum(get_intersection > 4)
+sum(get_intersection > 5)
+sum(get_intersection > 6)
+
+
+extra_plot =FALSE
+
+if(extra_plot){
+  # trans = "rel"
+  # correction = "uncorrected"
+  if(grepl("Kaplan",folder)){
+    spec_max = 60
+    spec_height = 9
+    spec_height2 = 4
+    spec_width=11
+    spec_text=4
+  }else{
+    spec_text=3.5
+    spec_max = 250
+    spec_width = 12
+    spec_height = 10
+    spec_height2 = 10
+  }
+  lefse_list = readRDS(paste0(data_dir ,"/upset_",trans,"_",correction,".rds"))
+  names(lefse_list) = gsub("_"," ",names(lefse_list))
+  pdf(paste0(data_dir ,"/upset_",trans,"_",correction,".pdf"),width=spec_width,height=spec_height)
+  
+  upset(fromList(lefse_list),order.by="freq",nsets=7,text.scale=spec_text,
+        mainbar.y.max =spec_max,point.size=5,line.size=2)
+  
+  dev.off()
+  
+  pdf(paste0(data_dir ,"/scaleupset_",trans,"_",correction,".pdf"),width=spec_width,height=spec_height2)
+  
+  upset(fromList(lefse_list),order.by="freq",nsets=7,text.scale=2,mainbar.y.max =spec_max)
+  
+  # upset(fromList(lefse_list),order.by="freq",nsets=length(study_names),
+  #       mainbar.y.max = 60)
+  dev.off()
+  
+  
+  
+  
+}

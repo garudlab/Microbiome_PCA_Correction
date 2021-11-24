@@ -2,15 +2,18 @@
 
 ## example: run inside Corrections Folder
 ## example: run from main director (Microbiome_PCA_Correction)
-# Rscript Correction/calc_pcs.R ~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 rel_clr
+# Rscript Correction/correction.R ~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 logcpm
+# Rscript Correction/correction.R /u/home/b/briscoel/project-halperin/MicroBatch/data/AGPr_max_k5 rds logcpm combat study bin_crc_normal
 
 args = commandArgs(trailingOnly=TRUE)
 data_dir = args[1] #~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 
 format = args[2]
 transformation = args[3] #rel_clr
 correction = args[4] #limma
-batch_column = args[5]
-phenotype_column = args[6]
+if(length(args) >= 5){
+  batch_column = args[5]
+  phenotype_column = args[6]
+}
 # FUNCTIONS
 source(paste0("Correction/correction_source.R"))
 
@@ -35,10 +38,10 @@ if(length(args) >= 5){
   if(grepl("Thomasr_complete_otu",data_dir)){
     dataset_batch = metadata_table$dataset_name
     dataset_phenotype = metadata_table$bin_crc_normal
-  }else if(grepl("Kaplan",folder)){
+  }else if(grepl("Kaplan",data_dir)){
     dataset_batch = metadata_table$extraction_robot..exp.
     dataset_phenotype = metadata_table$diabetes_self_v2
-  }else if(grepl("Thomasr_max_",folder)){
+  }else if(grepl("Thomasr_max_",data_dir)){
     dataset_batch = metadata_table$dataset_name
     new_pheno = sapply(metadata_table$bin_crc_normal,function(x){
       if(is.na(x)){return(NA)}
@@ -48,7 +51,7 @@ if(length(args) >= 5){
     metadata_table$bin_crc_normal = new_pheno
     dataset_phenotype = metadata_table$bin_crc_normal
     
-  }else if(grepl("AGP",folder)){
+  }else if(grepl("AGP",data_dir)){
     new_pheno = sapply(metadata_table$bin_antibiotic_last_year,function(x){
       if(is.na(x)){return(NA)}
       if(x == "Yes"){return(1)}
@@ -73,7 +76,7 @@ if(length(args) >= 5){
     dataset_batch = metadata_table$study
     dataset_phenotype = metadata_table$bin_crc_normal
     
-  }else if(grepl("Gibbonsr_max", folder)){
+  }else if(grepl("Gibbonsr_max", data_dir)){
     dataset_batch = metadata_table$study
     dataset_phenotype = metadata_table$bin_crc_normal
     
@@ -139,7 +142,12 @@ if(correction == "DCC"){
 
 if(correction == "combat"){
 
-  feature_table = correct_ComBat(mat = as.matrix(log(feature_table+pseudocount)),batch_labels = dataset_batch)
+  if(transformation != "logcpm" & transformation != "rel_clr" & transformation != "vst" ){
+    feature_table = correct_ComBat(mat = as.matrix(log(feature_table+pseudocount)),batch_labels = dataset_batch)
+    
+  }else{
+    feature_table = correct_ComBat(mat = as.matrix(feature_table),batch_labels = dataset_batch)
+  }
   feature_table_counts = exp(feature_table) #, t(feature_table_orig))
   
   if(round_time){
@@ -154,8 +162,15 @@ if(correction == "combat"){
   }
 }
 if(correction == "limma"){
+  if(transformation != "logcpm" & transformation != "rel_clr" & transformation != "vst" ){
+    feature_table = correct_limma(mat = log(feature_table+pseudocount),batch_labels = dataset_batch)
+    
+  }else{
+    feature_table = correct_limma(mat = feature_table,batch_labels = dataset_batch)
+    
+    
+  }
   
-  feature_table = correct_limma(mat = log(feature_table+pseudocount),batch_labels = dataset_batch)
   feature_table_counts = exp(feature_table) #, t(feature_table_orig))
   if(round_time){
     feature_table_counts = round(feature_table_counts,5)

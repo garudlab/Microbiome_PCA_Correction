@@ -3,20 +3,20 @@ local = TRUE
 
 require(dplyr)
 if(local){
-  
-  # #Kaplan
+
+  #Kaplan
   # args = c("Kaplanr_max_k5","rel","True","pearson")
   # # "bmc", "combat", "percentilenorm", "limma", "DCC", a
-  # dtype_pca = "counts" # counts
+  # dtype_pca = "" # counts
   # pca_methods = c(paste0("clr_pca",c(c(2,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
 
-  # #Kaplan otu
-  # args = c("Kaplanr_complete_otu","rel","True","pearson")
-  # dtype_pca = "" # counts
-  # pca_methods = c(paste0("clr_pca",c(c(1,2,3,4,5,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
+  #Kaplan otu
+  args = c("Kaplanr_complete_otu","rel","True","pearson")
+  dtype_pca = "" # counts
+  pca_methods = c(paste0("clr_pca",c(c(1,2,3,4,5,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
 
 
-  
+
 }
 
 margins_list = list()
@@ -284,6 +284,10 @@ if(grepl("AGPr",folder) & lodo == "False"){
    
 
 ggsave(plot=p,filename=paste0(data_dir,"/",meas,"_BOX_lodo",lodo,"_trans_",trans, ".pdf"),width = 7,height = 5,units="in")
+saveRDS(p,paste0(data_dir,"/",folder,"_",meas,"_BOX_",trans, "_lodo_",lodo,  ".rds"))
+
+
+
 
 if(lodo == "False"){
   saveRDS(p,paste0(data_dir,"/",meas,"_BOX_",trans, ".rds"))

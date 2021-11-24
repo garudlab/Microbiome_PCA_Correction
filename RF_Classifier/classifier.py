@@ -1,13 +1,13 @@
-# python classifier.py --folder Gibbonsr_max_k7 --trans rel --correction nocorrection --lodo 1 --phenotype bin_crc_normal --n_estimators 100 --criterion entropy --max_depth None --min_samples_split 2 --min_samples_leaf 5 --max_features auto
+# python classifier.py --folder Gibbonsr_max_k5 --trans vst --correction nocorrection --lodo 1 --phenotype bin_crc_normal --n_estimators 100 --criterion entropy --max_depth None --min_samples_split 2 --min_samples_leaf 5 --max_features auto
 
 
 # python classifier.py --folder Thomasr_max_k7 --trans rel --correction nocorrection --lodo 0 --phenotype bin_crc_normal --n_estimators 100 --criterion gini --max_depth None --min_samples_split 5 --min_samples_leaf 1 --max_features auto
 
 # python classifier.py --folder Kaplanr_complete_otu --trans rel --correction clr --lodo 1 --phenotype diabetes_self_v2 --n_estimators 100 --criterion entropy --max_depth None --min_samples_split 5 --min_samples_leaf 1 --max_features auto
 # python classifier.py --folder Thomasr_complete_otu --trans vsd --correction pca2counts --lodo 1 --phenotype bin_crc_normal --n_estimators 100 --criterion entropy --max_depth 1 --min_samples_split 5 --min_samples_leaf 1 --max_features 0.1
-# python classifier.py --folder AGPr_max_k8 --trans rel --correction clr_pca2counts --lodo 0 --phenotype bin_antibiotic_last_year --n_estimators 100 --criterion entropy --max_depth 1 --min_samples_split 5 --min_samples_leaf 1 --max_features 0.1
+# python classifier.py --folder AGPr_max_k5 --trans vst--correction nocorrection --lodo 1 --phenotype bin_antibiotic_last_year --n_estimators 100 --criterion entropy --max_depth 1 --min_samples_split 5 --min_samples_leaf 1 --max_features 0.1
 
-# python classifier.py --folder AGPr_complete_otu --trans rel --correction nocorrection --lodo 0 --phenotype bin_antibiotic_last_year --n_estimators 100 --criterion entropy --max_depth 1 --min_samples_split 5 --min_samples_leaf 1 --max_features 0.1
+# python classifier.py --folder AGPr_complete_otu --trans rel --correction clr_pca3 --lodo 1 --phenotype bin_antibiotic_last_year --n_estimators 100 --criterion entropy --max_depth 1 --min_samples_split 5 --min_samples_leaf 1 --max_features 0.1
 
 
 import argparse,sys
@@ -56,7 +56,10 @@ print(args)
 
 folder = args.folder # "AGPr_max_k5" #"AGPr_complete_otu" 
 trans = args.trans #"rel"
-correction = args.correction
+correction = args.correction.strip()
+
+print("Correction")
+print(correction)
 lodo = bool(args.lodo)
 phenotype = args.phenotype
 param_n_estimators = args.n_estimators

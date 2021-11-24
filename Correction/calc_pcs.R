@@ -5,13 +5,15 @@
 
 #install.packages("bigstatsr")
 args = commandArgs(trailingOnly=TRUE)
+#args = c("~/Documents/MicroBatch/microbatch_vc/data/Kaplanr_complete_otu" ,"rds", "rel_clr")
+
 data_dir = args[1] #~/Documents/MicroBatch/microbatch_vc/data/Gibbonsr_max_k5 
 format = args[2]
 transformation = args[3] #rel_clr
 
 # FUNCTIONS
 source(paste0("Correction/correction_source.R"))
-
+#source(paste0("~/Documents/MicroBatch/microbatch_vc/RevisionSequence/Correction/correction_source.R"))
 
 
 ##READ in data 
@@ -25,6 +27,7 @@ if(format == "rds"){
 }
 
 pca_score_results = pca_method(feature_table, num_pcs = num_pcs_calc)
+sum(pca_score_results[[2]][1:10])/sum(pca_score_results[[2]])
 pca_score = pca_score_results[[1]]
 print("dim pca scores")
 print(dim(pca_score))
