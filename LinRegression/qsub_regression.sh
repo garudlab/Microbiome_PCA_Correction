@@ -62,7 +62,7 @@ elif [[ "$dataset_input" == *"k7"* ]]; then
 
 elif [[ "$dataset_input" == *"k8"* ]]; then
 	echo "$first_count_input:$COUNTER"
-	qsub -cwd -V -o misc -e misc -N Lin -l h_data=16G,time=24:00:00,highp -b y -t $first_count_input:$COUNTER "./run_regression.sh"
+	qsub -cwd -V -o misc -e misc -N Lin -l h_data=20G,time=24:00:00,highp -b y -t $first_count_input:$COUNTER "./run_regression.sh"
 
 elif [[ "$dataset_input" == *"k6"* ]]; then
 	echo "$first_count_input:$COUNTER"

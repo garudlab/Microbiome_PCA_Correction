@@ -51,6 +51,7 @@ pca_methods_list[[4]] =c(paste0(extra_trans,"pca",c(4,33),""))
 pca_methods_list[[5]] =c(paste0(extra_trans,"pca",c(3,33),"")) 
 pca_methods_list[[6]] =c(paste0(extra_trans,"pca",c(2,33),"")) 
 
+#"AGPr_max_k"
 
 
 margins_list = list()
@@ -79,7 +80,16 @@ folder_spec[["Thomasr_max_k6"]] = list(nocorrection = "Thomasr_max_k7",
                                        clr_pca3 = "Thomasr_max_k7",
                                        clr_pca33 = "Thomasr_max_k7",
                                        logcpm =  "Thomasr_max_k7",
-                                       vst = "Thomasr_max_k6")
+                                       vst = "Thomasr_max_k6",
+                                       logcpm_combat = "Thomasr_max_k7",
+                                       logcpm_limma = "Thomasr_max_k7",
+                                       logcpm_bmc = "Thomasr_max_k7",
+                                       vst_combat = "Thomasr_max_k7",
+                                       vst_limma = "Thomasr_max_k7",
+                                       vst_bmc = "Thomasr_max_k7",
+                                       rel_clr_combat = "Thomasr_max_k6", 
+                                       rel_clr_limma = "Thomasr_max_k7",
+                                       rel_clr_bmc = "Thomasr_max_k7")
 
 # lodo True
 folder_spec[["AGPr_max_k5"]] = list(nocorrection = "AGPr_max_k8",
@@ -91,7 +101,17 @@ folder_spec[["AGPr_max_k5"]] = list(nocorrection = "AGPr_max_k8",
                                     clr_pca4 = "AGPr_max_k5",
                                     clr_pca33 = "AGPr_max_k8",
                                     logcpm =  "AGPr_max_k6",
-                                    vst = "AGPr_max_k8")
+                                    vst = "AGPr_max_k8",
+                                    logcpm_combat = "AGPr_max_k7",
+                                    logcpm_limma = "AGPr_max_k7" ,
+                                    logcpm_bmc = "AGPr_max_k7",
+                                    vst_combat = "AGPr_max_k7",
+                                    vst_limma = "AGPr_max_k8",
+                                    vst_bmc = "AGPr_max_k7",
+                                    rel_clr_combat = "AGPr_max_k8", 
+                                    rel_clr_limma = "AGPr_max_k7",
+                                    rel_clr_bmc = "AGPr_max_k8")
+                                    
 
 # folder_spec[["AGPr_max_k5"]] = list(nocorrection = "AGPr_max_k5",
 #                                     combat =  "AGPr_max_k5",
@@ -112,7 +132,16 @@ folder_spec[["Gibbonsr_max_k5"]] = list(nocorrection = "Gibbonsr_max_k8",
                                         clr_pca2 = "Gibbonsr_max_k8",
                                         clr_pca33 = "Gibbonsr_max_k7",
                                         logcpm =  "Gibbonsr_max_k7",
-                                        vst =  "Gibbonsr_max_k8")
+                                        vst =  "Gibbonsr_max_k8",
+                                        logcpm_combat = "Gibbonsr_max_k7",
+                                        logcpm_limma = "Gibbonsr_max_k7",
+                                        logcpm_bmc = "Gibbonsr_max_k7",
+                                        vst_combat = "Gibbonsr_max_k8",
+                                        vst_limma = "Gibbonsr_max_k8",
+                                        vst_bmc = "Gibbonsr_max_k8",
+                                        rel_clr_combat = "Gibbonsr_max_k8",
+                                        rel_clr_limma = "Gibbonsr_max_k8",
+                                        rel_clr_bmc = "Gibbonsr_max_k8")
 
 # LODO = false
 # folder_spec[["Gibbonsr_max_k5"]] = list(nocorrection = "Gibbonsr_max_k8",  
@@ -125,27 +154,22 @@ folder_spec[["Gibbonsr_max_k5"]] = list(nocorrection = "Gibbonsr_max_k8",
 #                                     clr_pca33 = "Gibbonsr_max_k8")
 
 # Lodo = True
-folder_spec[["Kaplanr_max_k5"]] = list(nocorrection = "Kaplanr_max_k8",
-                                       combat = "Kaplanr_max_k5",
-                                       DCC =   "Thomasr_max_k7",
-                                       limma =  "Thomasr_max_k7",
-                                       bmc =   "Thomasr_max_k7",
-                                       clr = "Thomasr_max_k7",
-                                       clr_pca3counts = "Thomasr_max_k7",
-                                       clr_pca33counts = "Thomasr_max_k7")
+
 #folder_spec[["Kaplanr_max_k5"]] = list(test =c(1,2), test2 = c(3,4))
 notecex_list= list()
-notecex_list[["Gibbonsr_complete_otu"]] = 1
-notecex_list[["Gibbonsr_max_otu"]] = 1
-notecex_list[["Gibbonsr_max_k7"]] =1
-notecex_list[["Gibbonsr_max_k8"]] =1
-notecex_list[["Gibbonsr_max_k6"]] =1
-notecex_list[["Gibbonsr_max_k5"]] =1
-notecex_list[["Thomasr_complete_otu"]] = 0.9
-notecex_list[["Thomasr_max_k6"]] = 0.9
-notecex_list[["AGPr_complete_otu"]] = 1
-notecex_list[["Kaplanr_complete_otu"]] = 1
-notecex_list[["AGPr_max_k8"]] = 1
+val = 0.6
+notecex_list[["Gibbonsr_complete_otu"]] =val
+notecex_list[["Gibbonsr_max_otu"]] =val
+notecex_list[["Gibbonsr_max_k7"]] = val
+notecex_list[["Gibbonsr_max_k8"]] = val
+notecex_list[["Gibbonsr_max_k6"]] = val
+notecex_list[["Gibbonsr_max_k5"]] = val
+notecex_list[["Thomasr_complete_otu"]] = val
+notecex_list[["Thomasr_max_k6"]] = val
+notecex_list[["AGPr_complete_otu"]] = val
+notecex_list[["Kaplanr_complete_otu"]] = val
+notecex_list[["AGPr_max_k8"]] =val
+notecex_list[["AGPr_max_k5"]] =val
 print(args)
 
 
@@ -160,6 +184,7 @@ if(local){
 
 
 for(a in 1:length(folders)){
+#for(a in 4:4){
   args = c(folders[a],"rel","True","AUC")
   pca_methods = pca_methods_list[[a]]
   dtype_pca = dtypes_pca[[a]]
@@ -177,7 +202,9 @@ for(a in 1:length(folders)){
   
   #   c("clr_scale_pca",
   # "clr_pca1roundcounts", "clr_pca1", "clr_pca2roundcounts", "clr_pca2", "clr_pca3roundcounts", "clr_pca3")
-  other_methods = c("nocorrection","DCC","combat","limma","bmc","clr","logcpm","vst" ) # , 
+  other_methods = c("nocorrection","DCC","combat","limma","bmc","logcpm","vst","clr",
+                    "logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
+                    "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc"  ) # , 
   corrections_vec = c(other_methods, pca_methods)
   trans_methods = rep(trans,length(corrections_vec))
   
@@ -186,10 +213,22 @@ for(a in 1:length(folders)){
   corrections_list = list()
   for(cori in 1:length(corrections_vec)){
     if( folder %in% names(folder_spec)){
-      pathy =  paste0(main_dir,folder_spec[[folder]][[corrections_vec[cori]]],"/", "GRID_", meas,"_OUTPUT_" ,trans_methods[cori], "_" , corrections_vec[cori] , "_lodo_" , lodo  , ".csv")
-      
+      if(corrections_vec[cori] %in% c("logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
+                                      "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc"   )){
+        pathy =  paste0(main_dir,folder_spec[[folder]][[corrections_vec[cori]]],"/", "GRID_", meas,"_OUTPUT_" ,corrections_vec[cori] , "_lodo_" , lodo  , ".csv")
+      }else{
+        pathy =  paste0(main_dir,folder_spec[[folder]][[corrections_vec[cori]]],"/", "GRID_", meas,"_OUTPUT_" ,trans_methods[cori], "_" ,corrections_vec[cori] , "_lodo_" , lodo  , ".csv")
+        
+      }
     }else{
-      pathy  = paste0(data_dir, "GRID_", meas,"_OUTPUT_" ,trans_methods[cori], "_" , corrections_vec[cori] , "_lodo_" , lodo  , ".csv")
+      if(corrections_vec[cori] %in% c("logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
+                                      "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc"   )){
+        pathy  = paste0(data_dir, "GRID_", meas,"_OUTPUT_" ,corrections_vec[cori] , "_lodo_" , lodo  , ".csv")
+        
+      }else{
+        pathy  = paste0(data_dir, "GRID_", meas,"_OUTPUT_" ,trans_methods[cori], "_" , corrections_vec[cori] , "_lodo_" , lodo  , ".csv")
+        
+      }
       
       
     }
@@ -232,8 +271,15 @@ for(a in 1:length(folders)){
   
   #install.packages("gplots")
   require(gplots)
-  nonnice_names =  c("nocorrection","DCC","combat","limma","bmc","clr","logcpm","vst", paste0(extra_trans,"pca33",dtype_pca),pca_method_best) 
-  nice_names =  c("Uncorrected","DCC","ComBat","limma","BMC","CLR","logCPM","VST","Fixed PCA Correction","Tuned PCA Correction")
+
+  nonnice_names =  c("nocorrection","DCC","combat","limma","bmc","logcpm","vst", "clr", 
+                     "logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
+                     "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc" ,
+                     paste0("clr_pca33",dtype_pca),pca_method_best) 
+  nice_names =  c("Uncorrected","DCC","ComBat","limma","BMC","logCPM","VST","CLR",
+                  "logCPM ComBat", "logCPM limma",  "logCPM BMC" ,   "VST ComBat" ,   "VST limma" ,    "VST BMC"  ,     "CLR ComBat" ,   "CLR limma"  ,   "CLR BMC" ,
+                  "Fixed PCA Correction","Tuned PCA Correction")
+  
   
   presence_index = which(nonnice_names %in% corrections_vec)
   nice_names  = nice_names[presence_index ]
@@ -266,11 +312,14 @@ for(a in 1:length(folders)){
     input_str = apply(input,2, function(x){sprintf("%.2f",round(x,2))})
     
     # blue palette c("#FFFFFF", "#2B9EDE"
-    
-    
+    # dev.off()
+    # heatmap.2(t(input), trace="none", density="none", col=colorRampPalette(c("red","yellow")), cexRow=1.2, cexCol=0.8, 
+    #           margins = c(10,11),
+    #           Rowv = FALSE, Colv =  "Rowv",cellnote=t(input_str),notecol="black",srtCol = 45,notecex=0.3)
+    # 
     
     pdf(paste0(data_dir,"/",meas,"LODO_Heatmap_",trans, ".pdf"))
-    heatmap.2(t(input), trace="none", density="none", col=colorRampPalette(c("red","yellow")), cexRow=1.2, cexCol=1.2, 
+    heatmap.2(t(input), trace="none", density="none", col=colorRampPalette(c("red","yellow")), cexRow=1.2, cexCol=0.8, 
               margins = margins_list[[folder]],
               Rowv = FALSE, Colv =  "Rowv",cellnote=t(input_str),notecol="black",srtCol = 45,notecex=notecex_list[[folder]])
     dev.off()
@@ -317,7 +366,12 @@ for(a in 1:length(folders)){
   library(ggpubr)
   #install.packages("ggpubr")
   #'#fdd0a2',"#9A33FF","#F133FF","#3341FF",
-  custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF","#72C1FC","#0093FF")[presence_index]
+  #custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF","#72C1FC","#0093FF")[presence_index]
+  custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF",
+                    rep("#9A33FF",3),
+                    rep("#F133FF",3),
+                    rep("#3341FF",3),
+                    "#72C1FC","#0093FF")[presence_index ]
   
   #palette = "jco"
   p <- ggboxplot(to_plot, x = "Var1", y = "value",
@@ -473,32 +527,44 @@ if(comparison){
     data_dir2 = paste0(main_dir,folder2,"/")
     data2 = readRDS(paste0(data_dir2,folder2,"_",meas,"_BOX_",trans, "_lodo_",lodo,  ".rds"))$data
     
-    data1$Var1 = paste0(data1$Var1," Species")
-    data2$Var1 = paste0(data2$Var1," k-mer")
+    data1$Var1 = paste0(data1$Var1," S")
+    data2$Var1 = paste0(data2$Var1," k")
     my_comparisons <- list()
     for(u1 in 1:length(methods)){
-      my_comparisons[[u1]] = c(paste0(methods[u1] ," Species"),paste0(methods[u1] ," k-mer"))
+      my_comparisons[[u1]] = c(paste0(methods[u1] ," S"),paste0(methods[u1] ," k"))
     }
-    custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF","#72C1FC","#0093FF")[presence_index]
+    #custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF","#72C1FC","#0093FF")[presence_index]
+    custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF",
+                      rep("#9A33FF",3),
+                      rep("#F133FF",3),
+                      rep("#3341FF",3),
+                      "#72C1FC","#0093FF")
     
     to_plot_ = rbind(data1,data2)
     p <- ggboxplot(to_plot_, x = "Var1", y = "value",
-                   fill = "Var1", palette = c(custom_colors,custom_colors)) +xlab("Correction") +
+                   fill = "Var1", palette = c(custom_colors,custom_colors),
+                   lwd=0.2,outlier.size=0.1,outlier.stroke = 0.3) +xlab("Correction") +
       ylab(paste0("Cross-validated ", meas) ) +
-      stat_compare_means(comparisons = my_comparisons, method = "t.test",label = "p.signif",paired=TRUE,
-                         col = "#e32f27",vjust=1,method.args = list(alternative = direction),hide.ns = TRUE,size=2,
-                         tip.length = 0.1,
-                         bracket.size = 0.1) +
-      theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=8),
+      # stat_compare_means(comparisons = my_comparisons, method = "t.test",label = "p.signif",paired=TRUE,
+      #                    col = "#e32f27",vjust=1,method.args = list(alternative = direction),hide.ns = TRUE,size=2,
+      #                    tip.length = 0.05,
+      #                    bracket.size = 0.08) +
+      stat_compare_means(ref.group = "Uncorrected S", method = "t.test",label = "p.signif",paired=TRUE,
+                         col = "#e32f27",vjust=1,method.args = list(alternative = "greater"),hide.ns = TRUE,size=2,
+                         tip.length = 0.05,
+                         bracket.size = 0.08) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=4),
             legend.position = "none",
             panel.grid.major.x = element_blank() ,
             # explicitly set the horizontal lines (or they will disappear too)
             panel.grid.major.y = element_line( size=.1, color="black" ))
     assign(paste0("pair_",folder1), p)
   }
+  ?ggarrange
+  pp <- ggarrange(pair_Kaplanr_complete_otu,pair_AGPr_complete_otu,pair_Thomasr_complete_otu,pair_Gibbonsr_complete_otu,ncol=1)
+  ggsave(plot=pp,filename=paste0(main_dir,"AllBox_",direction, ".pdf"))
+  #ggsave(plot=pp,filename=paste0(main_dir,"AllBox_",direction, ".pdf"),width = 7,height = 5,units="in")
   
 }
-pp <- ggarrange(pair_AGPr_complete_otu,pair_Kaplanr_complete_otu,pair_Thomasr_complete_otu,pair_Gibbonsr_complete_otu)
-ggsave(plot=pp,filename=paste0(main_dir,"AllBox_",direction, ".pdf"),width = 7,height = 5,units="in")
 ?stat_compare_means
 ?wilcox.test

@@ -15,8 +15,8 @@ folder = c(rep(paste0("Gibbonsr",appendage),2),
 trans = rep(c("rel","rel_clr"),4)
 trans_pretty =rep(c("None","CLR"),4)
 trans_pretty_ = c("None","CLR")
-only_confounders = TRUE
-only_biology = FALSE
+only_confounders =TRUE
+only_biology =FALSE
 phenotype_range =  list(1,1,1,1,1,1,c(1,3),c(1,3))
 confounder_range = list(c(5,6,7),c(5,6,7),
                         c(5,6,7),c(5,6,7),
@@ -34,7 +34,7 @@ if(local){
 require(reshape2)
 require(ggplot2)
 for(b in 1:length(folder)){
-
+b=6
   data_dir = paste0(main_dir,folder[b],"/")
   plot_object = readRDS(paste0(data_dir,"CanCorPlotObj_",trans[b], ".rds"))
   if(only_confounders){
@@ -47,6 +47,7 @@ for(b in 1:length(folder)){
     title_time = "All variables"
     wavy_melt = melt(plot_object$CanCorC) 
   }
+  mean(wavy_melt$value)
   
   colnames(wavy_melt) = c("Variable","PC","Correlation")
   wavy_melt$Transformation = trans_pretty[b]

@@ -5,25 +5,22 @@ require(dplyr)
 if(local){
 
   #Kaplan
-  # args = c("Kaplanr_max_k5","rel","True","pearson")
-  # # "bmc", "combat", "percentilenorm", "limma", "DCC", a
-  # dtype_pca = "" # counts
-  # pca_methods = c(paste0("clr_pca",c(c(2,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
+  args = c("Kaplanr_max_k5","rel","True","pearson")
+  # "bmc", "combat", "percentilenorm", "limma", "DCC", a
+  dtype_pca = "" # counts
+  pca_methods = c(paste0("clr_pca",c(c(2,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
 
   #Kaplan otu
-  args = c("Kaplanr_complete_otu","rel","True","pearson")
-  dtype_pca = "" # counts
-  pca_methods = c(paste0("clr_pca",c(c(1,2,3,4,5,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
+  # args = c("Kaplanr_complete_otu","rel","True","pearson")
+  # dtype_pca = "" # counts
+  # pca_methods = c(paste0("clr_pca",c(c(1,2,3,4,5,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
 
 
 
 }
 
 margins_list = list()
-margins_list[["Gibbonsr_complete_otu"]] =c(16,17)
-margins_list[["Thomasr_complete_otu"]] =c(13,15)
-margins_list[["Thomasr_max_k7"]] =c(15,13)
-margins_list[["AGPr_complete_otu"]] =c(5,13)
+
 margins_list[["Kaplanr_complete_otu"]] =c(20,8)
 margins_list[["Kaplanr_max_k6"]] =c(20,8)
 margins_list[["Kaplanr_max_k5"]] =c(20,8)
@@ -58,18 +55,27 @@ folder_spec[["Kaplanr_max_k5"]] = list(nocorrection = "Kaplanr_max_k5",
                                     clr_pca2 = "Kaplanr_max_k8",
                                     clr_pca33 = "Kaplanr_max_k8",
                                     logcpm =  "Kaplanr_max_k7",
-                                    vst =  "Kaplanr_max_k8")
+                                    vst =  "Kaplanr_max_k8",
+                                    logcpm_combat = "Kaplanr_max_k7",
+                                    logcpm_limma = "Kaplanr_max_k7",
+                                    logcpm_bmc = "Kaplanr_max_k7",
+                                    vst_combat = "Kaplanr_max_k8",
+                                    vst_limma = "Kaplanr_max_k8",
+                                    vst_bmc = "Kaplanr_max_k8",
+                                    rel_clr_combat = "Kaplanr_max_k8",
+                                    rel_clr_limma = "Kaplanr_max_k8",
+                                    rel_clr_bmc = "Kaplanr_max_k8")
 
 notecex_list= list()
 notecex_list[["Gibbonsr_complete_otu"]] = 1
 notecex_list[["Thomasr_complete_otu"]] = 1
 notecex_list[["Thomasr_max_k7"]] = 1
 notecex_list[["AGPr_complete_otu"]] = 1
-notecex_list[["Kaplanr_complete_otu"]] = 1
-notecex_list[["Kaplanr_max_k6"]] = 1
-notecex_list[["Kaplanr_max_k5"]] = 1
-notecex_list[["Kaplanr_max_k7"]] = 1
-notecex_list[["Kaplanr_max_k8"]] = 1
+notecex_list[["Kaplanr_complete_otu"]] = 0.5
+notecex_list[["Kaplanr_max_k6"]] = 0.5
+notecex_list[["Kaplanr_max_k5"]] = 0.5
+notecex_list[["Kaplanr_max_k7"]] = 0.5
+notecex_list[["Kaplanr_max_k8"]] = 0.5
 
 notecex_text_list = notecex_list
 notecex_text_list[["Thomasr_complete_otu"]] = 1.2
@@ -93,9 +99,13 @@ meas = args[4]
 data_dir = paste0(main_dir,folder,"/")
 
 
+
+
 #   c("clr_scale_pca",
 # "clr_pca1roundcounts", "clr_pca1", "clr_pca2roundcounts", "clr_pca2", "clr_pca3roundcounts", "clr_pca3")
-other_methods = c("nocorrection","DCC","combat","limma","bmc","clr","logcpm","vst" ) # "combat", 
+other_methods = c("nocorrection","DCC","combat","limma","bmc","logcpm","vst" ,"clr",
+                  "logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
+                  "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc"   ) # "combat", 
 
 corrections_vec = c(other_methods, pca_methods)
 trans_methods = rep(trans,length(corrections_vec))
@@ -105,10 +115,24 @@ corrections_list = list()
 for(cori in 1:length(corrections_vec)){
   #cori = 1
  if( folder %in% names(folder_spec)){
-    metrics_pre =  read.csv(paste0(main_dir,folder_spec[[folder]][[corrections_vec[cori]]],"/", "PRED_OUTPUT_" ,trans_methods[cori], "_" , corrections_vec[cori] , "_lodo_" , lodo  , ".csv"), header=TRUE)
-    
+   if(corrections_vec[cori] %in% c("logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
+              "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc"   )){
+     metrics_pre =  read.csv(paste0(main_dir,folder_spec[[folder]][[corrections_vec[cori]]],"/", "PRED_OUTPUT_" , corrections_vec[cori] , "_lodo_" , lodo  , ".csv"), header=TRUE)
+     
+   }else{
+     metrics_pre =  read.csv(paste0(main_dir,folder_spec[[folder]][[corrections_vec[cori]]],"/", "PRED_OUTPUT_" ,trans_methods[cori], "_" , corrections_vec[cori] , "_lodo_" , lodo  , ".csv"), header=TRUE)
+     
+   }
+   
   }else{
-    metrics_pre =  read.csv(paste0(data_dir, "PRED_OUTPUT_" ,trans_methods[cori], "_" , corrections_vec[cori] , "_lodo_" , lodo  , ".csv"), header=TRUE)
+    if(corrections_vec[cori] %in% c("logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
+                                    "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc"   )){
+      metrics_pre =  read.csv(paste0(data_dir, "PRED_OUTPUT_" ,corrections_vec[cori] , "_lodo_" , lodo  , ".csv"), header=TRUE)
+      
+    }else{
+      metrics_pre =  read.csv(paste0(data_dir, "PRED_OUTPUT_" ,trans_methods[cori], "_" , corrections_vec[cori] , "_lodo_" , lodo  , ".csv"), header=TRUE)
+      
+    }
     
   }
   
@@ -156,8 +180,13 @@ corrections_df = corrections_df[corrections_vec,]
 #install.packages("gplots")
 require(gplots)
 
-nonnice_names =  c("nocorrection","DCC","combat","limma","bmc", "clr", "logcpm","vst",paste0("clr_pca33",dtype_pca),pca_method_best) 
-nice_names =  c("Uncorrected","DCC","ComBat","limma","BMC","CLR","logCPM","VST","Fixed PCA Correction","Tuned PCA Correction")
+nonnice_names =  c("nocorrection","DCC","combat","limma","bmc",  "logcpm","vst","clr",
+                   "logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
+                   "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc" ,
+                   paste0("clr_pca33",dtype_pca),pca_method_best) 
+nice_names =  c("Uncorrected","DCC","ComBat","limma","BMC","logCPM","VST","CLR",
+                "logCPM ComBat", "logCPM limma",  "logCPM BMC" ,   "VST ComBat" ,   "VST limma" ,    "VST BMC"  ,     "CLR ComBat" ,   "CLR limma"  ,   "CLR BMC" ,
+                "Fixed PCA Correction","Tuned PCA Correction")
 presence_index = which(nonnice_names %in% corrections_vec)
 nice_names  = nice_names[presence_index ]
 
@@ -193,7 +222,7 @@ if(lodo == "True"){
   
   ##2B9EDE
   pdf(paste0(data_dir,"/",meas,"LODO_Heatmap_",trans, ".pdf"))
-  heatmap.2(t(input), trace="none", density="none", col=colorRampPalette(c("red", "yellow")), cexRow=1.4, cexCol= 1.6, 
+  heatmap.2(t(input), trace="none", density="none", col=colorRampPalette(c("red", "yellow")), cexRow=1.4, cexCol= 1.1, 
             margins = margins_list[[folder]],
             Rowv = FALSE, Colv =  "Rowv",cellnote=t(input_str),notecol="black",srtCol = 45,notecex=notecex_list[[folder]])
   dev.off()
@@ -238,7 +267,11 @@ to_plot = melt(input) %>% filter(Var2 != "Average")
 require(ggplot2)
 library(ggpubr)
 #install.packages("ggpubr")
-custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF","#72C1FC","#0093FF")[presence_index ]
+custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF",
+                  rep("#9A33FF",3),
+                  rep("#F133FF",3),
+                  rep("#3341FF",3),
+                  "#72C1FC","#0093FF")[presence_index ]
 #custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF","#72C1FC","#0093FF")
 # 
 # stat_compare_means(comparisons = my_comparisons_dcc ,bracket.size = 0,ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE) + 

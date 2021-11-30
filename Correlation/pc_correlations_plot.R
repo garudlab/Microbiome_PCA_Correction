@@ -2,12 +2,12 @@ args = commandArgs(trailingOnly=TRUE)
 local = TRUE
 if(local){
   #args = c("Thomasr_max_k6","rel_clr","dataset_name") #
-  args = c("Thomasr_complete_otu","rel_clr","dataset_name") #
+  #args = c("Thomasr_complete_otu","rel_clr","dataset_name") #
   #args = c("Gibbonsr_complete_otu","rel","study")
   #args = c("Gibbonsr_max_k6","rel","study")
   #args = c("AGPr_complete_otu","rel","Instrument") #bin_antibiotic_last_year
   #args = c("AGPr_max_k6","rel","Instrument") #bin_antibiotic_last_year
-  #args = c("Kaplanr_complete_otu","rel","extraction_robot..exp.") #bin_antibiotic_last_year
+  args = c("Kaplanr_complete_otu","rel_clr","extraction_robot..exp.") #bin_antibiotic_last_year
   #args = c("Kaplanr_max_k6","rel","extraction_robot..exp.") #bin_antibiotic_last_year
 }
 
@@ -358,3 +358,10 @@ dim(plot_object$p_val_matrix)
 dev.off()
 
 plot_object$p_val_matrix[1:4,1:4]
+
+mean(plot_object$CanCorC[1,1:5])
+mean(plot_object$CanCorC[5,1:5])
+mean(plot_object$CanCorC[6,1:5])
+mean(plot_object$CanCorC[3,1:5])
+(1977.7556  + 630.3021  + 429.1580  + 378.6186 + 259.8160)/(1977.7556  + 630.3021  + 429.1580  + 378.6186 + 259.8160 + 257.4054 + 239.1097 + 221.5688 + 203.6235 +
+  196.7344 + 187.8528 + 184.5685 + 178.8438 + 175.3626  +171.2540)
