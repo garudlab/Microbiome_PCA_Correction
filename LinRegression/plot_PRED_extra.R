@@ -5,15 +5,15 @@ require(dplyr)
 if(local){
 
   #Kaplan
-  args = c("Kaplanr_max_k5","rel","True","pearson")
-  # "bmc", "combat", "percentilenorm", "limma", "DCC", a
-  dtype_pca = "" # counts
-  pca_methods = c(paste0("clr_pca",c(c(2,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
+  # args = c("Kaplanr_max_k5","rel","True","pearson")
+  # # "bmc", "combat", "percentilenorm", "limma", "DCC", a
+  # dtype_pca = "" # counts
+  # pca_methods = c(paste0("clr_pca",c(c(2,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
 
   #Kaplan otu
-  # args = c("Kaplanr_complete_otu","rel","True","pearson")
-  # dtype_pca = "" # counts
-  # pca_methods = c(paste0("clr_pca",c(c(1,2,3,4,5,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
+  args = c("Kaplanr_complete_otu","rel","True","pearson")
+  dtype_pca = "" # counts
+  pca_methods = c(paste0("clr_pca",c(c(1,2,3,4,5,33)),dtype_pca)) #,paste0("clr_pca",c(1:5)))
 
 
 
@@ -21,11 +21,11 @@ if(local){
 
 margins_list = list()
 
-margins_list[["Kaplanr_complete_otu"]] =c(20,8)
-margins_list[["Kaplanr_max_k6"]] =c(20,8)
-margins_list[["Kaplanr_max_k5"]] =c(20,8)
-margins_list[["Kaplanr_max_k7"]] =c(20,8)
-margins_list[["Kaplanr_max_k8"]] =c(20,8)
+margins_list[["Kaplanr_complete_otu"]] =c(24,12) 
+margins_list[["Kaplanr_max_k6"]] =c(24,12) 
+margins_list[["Kaplanr_max_k5"]] =c(24,12) 
+margins_list[["Kaplanr_max_k7"]] =c(24,12) 
+margins_list[["Kaplanr_max_k8"]] =c(24,12) 
 folder_spec = list()
 folder_spec[["AGPr_max_k5"]] = list(nocorrection = "AGPr_max_k5",
                                     combat =  "AGPr_max_k5",
@@ -103,7 +103,7 @@ data_dir = paste0(main_dir,folder,"/")
 
 #   c("clr_scale_pca",
 # "clr_pca1roundcounts", "clr_pca1", "clr_pca2roundcounts", "clr_pca2", "clr_pca3roundcounts", "clr_pca3")
-other_methods = c("nocorrection","DCC","combat","limma","bmc","logcpm","vst" ,"clr",
+other_methods = c("nocorrection","logcpm","vst" ,"clr","DCC","combat","limma","bmc",
                   "logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
                   "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc"   ) # "combat", 
 
@@ -180,11 +180,11 @@ corrections_df = corrections_df[corrections_vec,]
 #install.packages("gplots")
 require(gplots)
 
-nonnice_names =  c("nocorrection","DCC","combat","limma","bmc",  "logcpm","vst","clr",
+nonnice_names =  c("nocorrection", "logcpm","vst","clr","DCC","combat","limma","bmc", 
                    "logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
                    "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc" ,
                    paste0("clr_pca33",dtype_pca),pca_method_best) 
-nice_names =  c("Uncorrected","DCC","ComBat","limma","BMC","logCPM","VST","CLR",
+nice_names =  c("Uncorrected","logCPM","VST","CLR","DCC","ComBat","limma","BMC",
                 "logCPM ComBat", "logCPM limma",  "logCPM BMC" ,   "VST ComBat" ,   "VST limma" ,    "VST BMC"  ,     "CLR ComBat" ,   "CLR limma"  ,   "CLR BMC" ,
                 "Fixed PCA Correction","Tuned PCA Correction")
 presence_index = which(nonnice_names %in% corrections_vec)
@@ -222,9 +222,10 @@ if(lodo == "True"){
   
   ##2B9EDE
   pdf(paste0(data_dir,"/",meas,"LODO_Heatmap_",trans, ".pdf"))
-  heatmap.2(t(input), trace="none", density="none", col=colorRampPalette(c("red", "yellow")), cexRow=1.4, cexCol= 1.1, 
+  heatmap.2(t(input), trace="none", density="none", col=colorRampPalette(c("red", "yellow")), cexRow=1.0, cexCol= 0.9, 
             margins = margins_list[[folder]],
-            Rowv = FALSE, Colv =  "Rowv",cellnote=t(input_str),notecol="black",srtCol = 45,notecex=notecex_list[[folder]])
+            Rowv = FALSE, Colv =  "Rowv",cellnote=t(input_str),notecol="black",srtCol = 45,notecex=notecex_list[[folder]],
+            breaks=seq(-0.10,0.25,0.01))
   dev.off()
  
  
@@ -267,7 +268,8 @@ to_plot = melt(input) %>% filter(Var2 != "Average")
 require(ggplot2)
 library(ggpubr)
 #install.packages("ggpubr")
-custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF",
+custom_colors = c('#e32f27',"#9A33FF","#F133FF","#3341FF",
+                  "#C3FFCE",'#FF9300','#FFE800','#fdd0a2',
                   rep("#9A33FF",3),
                   rep("#F133FF",3),
                   rep("#3341FF",3),

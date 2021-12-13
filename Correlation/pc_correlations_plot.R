@@ -7,7 +7,7 @@ if(local){
   #args = c("Gibbonsr_max_k6","rel","study")
   #args = c("AGPr_complete_otu","rel","Instrument") #bin_antibiotic_last_year
   #args = c("AGPr_max_k6","rel","Instrument") #bin_antibiotic_last_year
-  args = c("Kaplanr_complete_otu","rel_clr","extraction_robot..exp.") #bin_antibiotic_last_year
+  args = c("Kaplanr_complete_otu","rel","extraction_robot..exp.") #bin_antibiotic_last_year
   #args = c("Kaplanr_max_k6","rel","extraction_robot..exp.") #bin_antibiotic_last_year
 }
 
@@ -307,6 +307,9 @@ new_rn = gsub(" corrected","",new_rn)
 new_rn = gsub("v2.x","",new_rn)
 new_rn = gsub("v2","",new_rn)
 new_rn = gsub("\\.."," ",new_rn)
+new_rn = gsub("bmi","BMI",new_rn)
+new_rn = gsub("placeofbirth","place of birth",new_rn)
+new_rn = gsub("extractionkit","extraction kit",new_rn)
 
 
 
@@ -317,6 +320,7 @@ new_cn = gsub(" corrected","",new_cn)
 new_cn = gsub("v2.x","",new_cn)
 new_cn = gsub("v2","",new_cn)
 new_cn = gsub("\\.."," ",new_cn)
+new_cn = gsub("bmi","BMI",new_cn)
 
 if(grepl("AGP",folder)){
   new_rn = gsub(".x","",new_rn)

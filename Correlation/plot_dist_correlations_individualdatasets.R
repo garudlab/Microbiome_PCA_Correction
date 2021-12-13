@@ -5,23 +5,24 @@
 # test$CanCorC
 require(dplyr)
 TOTAL_PCS=15
-appendage = "_complete_otu" #"_max_k6" #  
+appendage ="_max_k6" #   "_complete_otu" #     "
 folder = c(rep(paste0("Gibbonsr",appendage),2),
            rep(paste0("Thomasr",appendage),2),
-           rep(paste0("Kaplanr",appendage),2),
-           rep(paste0("AGPr",appendage),2))
+           rep(paste0("AGPr",appendage),2),
+           rep(paste0("Kaplanr",appendage),2))
+pretty_folders = c("CRC-16S","CRC-WGS","AGP","HCHS")
 # folder = c(rep("Gibbonsr_complete_otu",2),rep("Kaplanr_complete_otu",2),
 #            rep("AGPr_complete_otu",2),rep("Thomasr_complete_otu",2))
 trans = rep(c("rel","rel_clr"),4)
 trans_pretty =rep(c("None","CLR"),4)
 trans_pretty_ = c("None","CLR")
-only_confounders =TRUE
-only_biology =FALSE
-phenotype_range =  list(1,1,1,1,1,1,c(1,3),c(1,3))
+only_confounders = FALSE
+only_biology = TRUE
+phenotype_range =  list(1,1,1,1,c(1,3),c(1,3),1,1)
 confounder_range = list(c(5,6,7),c(5,6,7),
                         c(5,6,7),c(5,6,7),
-                        c(4,5,6),c(4,5,6),
-                        c(8,9),c(8,9)) # technical confounders only not biological
+                        c(8,9),c(8,9),
+                        c(4,5,6),c(4,5,6)) # technical confounders only not biological
 
 
 
@@ -34,7 +35,7 @@ if(local){
 require(reshape2)
 require(ggplot2)
 for(b in 1:length(folder)){
-b=6
+
   data_dir = paste0(main_dir,folder[b],"/")
   plot_object = readRDS(paste0(data_dir,"CanCorPlotObj_",trans[b], ".rds"))
   if(only_confounders){
@@ -65,6 +66,10 @@ b=6
 
 data_to_plot$Transformation = factor(data_to_plot$Transformation,levels =trans_pretty_)
 
+median(unlist(data_to_plot %>% 
+       filter(study == folder[5],Transformation == "CLR") %>% 
+       select(Correlation)))
+
 head(data_to_plot)
 unique_folder = unique(folder)
 plot_list = list()
@@ -73,7 +78,11 @@ for( b in 1:length(unique_folder)){
   x_test = temp_data_to_plot %>% filter(Transformation == "None") %>% select(Correlation)
   y_test = temp_data_to_plot %>% filter(Transformation == "CLR") %>% select(Correlation)
   
-  ks = ks.test(x = as.numeric(x_test$Correlation),y=as.numeric(y_test$Correlation),alternative = "greater")
+  #ks = ks.test(x = as.numeric(x_test$Correlation),y=as.numeric(y_test$Correlation),alternative = "greater")
+  head(x_test )
+  head(y_test)
+  ks = wilcox.test(x = as.numeric(x_test$Correlation),y=as.numeric(y_test$Correlation), paired = TRUE, 
+                   alternative = "less")
   
   
   mu = data.frame(mean =c(mean(x_test$Correlation ),mean(y_test$Correlation ) ),Transformation = trans_pretty_)
@@ -84,7 +93,7 @@ for( b in 1:length(unique_folder)){
                linetype="dashed") + theme_bw() +
     theme(aspect.ratio=1,text = element_text(size=10),axis.text.x = element_text(size=15),
           axis.text.y = element_text(size=15)) +
-    annotate(geom = 'text', label = paste0('KS p-value =\n',round(ks$p.value,4)), 
+    annotate(geom = 'text', label = paste0('p-value =\n',round(ks$p.value,4)), 
              x = Inf, y = Inf, hjust = 1.2, vjust = 1.2,size=6) + 
     ggtitle(paste0(unique_folder))
   
@@ -102,9 +111,10 @@ for( b in 1:length(unique_folder)){
                linetype="dashed") + theme_bw() +
     theme(aspect.ratio=1,text = element_text(size=5),axis.text.x = element_text(size=5),
           axis.text.y = element_text(size=5),legend.position = "none") +
-    annotate(geom = 'text', label = paste0('KS p-value =\n',round(ks$p.value,4)), 
+    annotate(geom = 'text', label = paste0('p-value =\n',round(ks$p.value,4)), 
              x = Inf, y = Inf, hjust = 1.2, vjust = 1.2,size=2.5) + 
-    ylab("Number of correlation pairs")
+    ylab("Number of correlation pairs") + 
+    xlab(paste0("PC Correlation in ", pretty_folders[b]))
   
   plot_list[[b]] = g
   
@@ -132,6 +142,7 @@ coords_y = c(-0.12,0.13,0.38,0.63)
 height_ = 0.5
 scale1 = 0.5
 
+
 g <- ggdraw() + draw_plot(plot_list[[1]],coords_x[1], coords_y[1], 0.5, 0.5,scale=scale1) +
   draw_plot(plot_list[[2]],coords_x[2], coords_y[2], 0.5, 0.5,scale = scale1)  + 
   draw_plot(plot_list[[3]],coords_x[3], coords_y[3], 0.5, 0.5,scale = scale1) + 
@@ -139,5 +150,6 @@ g <- ggdraw() + draw_plot(plot_list[[1]],coords_x[1], coords_y[1], 0.5, 0.5,scal
 data_dir = "/Users/leahbriscoe/Documents/MicroBatch/microbatch_vc/data/"
 ggsave(g,file=paste0(data_dir,"/",appendage,"only_confounders",
                      only_confounders,"only_biology",only_biology,"corr_plot.pdf"),device ="pdf")
+
 
 

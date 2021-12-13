@@ -52,23 +52,41 @@ pca_methods_list[[5]] =c(paste0(extra_trans,"pca",c(3,33),""))
 pca_methods_list[[6]] =c(paste0(extra_trans,"pca",c(2,33),"")) 
 
 #"AGPr_max_k"
+?heatmap.2
 
-
+# first number represents top/bottom (when I go from 23 to 10 what happens? it gets really tall)
+# big first - number = qauishing!
 margins_list = list()
-margins_list[["Gibbonsr_complete_otu"]] =c(23,8)
-margins_list[["Gibbonsr_max_k5"]] =c(23,8)
+margins_list[["Gibbonsr_complete_otu"]] =c(26,12) 
+margins_list[["Gibbonsr_max_k5"]] =c(26,12) 
 margins_list[["Gibbonsr_max_k6"]] =c(23,8)
 margins_list[["Gibbonsr_max_k7"]] =c(23,8)
 margins_list[["Gibbonsr_max_k8"]] =c(23,8)
-margins_list[["Thomasr_complete_otu"]] =c(13,13)
-margins_list[["Thomasr_max_k6"]] =c(13,13)
-margins_list[["AGPr_complete_otu"]] =c(23,10)
+margins_list[["Thomasr_complete_otu"]] =c(20,12)
+margins_list[["Thomasr_max_k6"]] =c(20,12)
+margins_list[["AGPr_complete_otu"]] =c(26,12) 
 margins_list[["AGPr_max_k8"]] =c(5,13)
-margins_list[["AGPr_max_k5"]] =c(23,11)
+margins_list[["AGPr_max_k5"]] =c(26,12) #24, 13 was good otherwise
 margins_list[["AGPr_max_k6"]] =c(5,13)
 margins_list[["AGPr_max_k7"]] =c(5,13)
+max_col = list()
+max_col[["Thomasr_complete_otu"]] = 0.87
+max_col[["Thomasr_max_k6"]] = 0.87
+max_col[["Gibbonsr_complete_otu"]] =0.89 
+max_col[["Gibbonsr_max_k5"]] =0.89
+max_col[["AGPr_complete_otu"]] =0.72
+max_col[["AGPr_max_k5"]] =0.72
+min_col = list()
+min_col[["Thomasr_complete_otu"]] = 0.44
+min_col[["Thomasr_max_k6"]] = 0.44
+min_col[["Gibbonsr_complete_otu"]] =0.51 
+min_col[["Gibbonsr_max_k5"]] =0.51
+min_col[["AGPr_complete_otu"]] =0.45 
+min_col[["AGPr_max_k5"]]=0.45
 
-margins_list[["Kaplanr_complete_otu"]] =c(5,13)
+
+
+margins_list[["Kaplanr_complete_otu"]] =c(23,13)
 folder_spec = list()
 # lodo True
 folder_spec[["Thomasr_max_k6"]] = list(nocorrection = "Thomasr_max_k7",
@@ -157,7 +175,7 @@ folder_spec[["Gibbonsr_max_k5"]] = list(nocorrection = "Gibbonsr_max_k8",
 
 #folder_spec[["Kaplanr_max_k5"]] = list(test =c(1,2), test2 = c(3,4))
 notecex_list= list()
-val = 0.6
+val = 0.4
 notecex_list[["Gibbonsr_complete_otu"]] =val
 notecex_list[["Gibbonsr_max_otu"]] =val
 notecex_list[["Gibbonsr_max_k7"]] = val
@@ -202,7 +220,8 @@ for(a in 1:length(folders)){
   
   #   c("clr_scale_pca",
   # "clr_pca1roundcounts", "clr_pca1", "clr_pca2roundcounts", "clr_pca2", "clr_pca3roundcounts", "clr_pca3")
-  other_methods = c("nocorrection","DCC","combat","limma","bmc","logcpm","vst","clr",
+  other_methods = c("nocorrection","logcpm","vst","clr",
+                    "DCC","combat","limma","bmc",
                     "logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
                     "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc"  ) # , 
   corrections_vec = c(other_methods, pca_methods)
@@ -271,12 +290,27 @@ for(a in 1:length(folders)){
   
   #install.packages("gplots")
   require(gplots)
+  
+  nonnice_names =  c("nocorrection","logcpm","vst", "clr", "DCC","combat","limma","bmc",
+  "logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
+  "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc" ,
+  paste0("clr_pca33",dtype_pca),pca_method_best) 
+  
 
-  nonnice_names =  c("nocorrection","DCC","combat","limma","bmc","logcpm","vst", "clr", 
-                     "logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
-                     "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc" ,
-                     paste0("clr_pca33",dtype_pca),pca_method_best) 
-  nice_names =  c("Uncorrected","DCC","ComBat","limma","BMC","logCPM","VST","CLR",
+  # nonnice_names =  c("nocorrection","DCC","combat","limma","bmc","logcpm","vst", "clr", 
+  #                    "logcpm_combat" , "logcpm_limma" ,  "logcpm_bmc" ,    "vst_combat"  ,   "vst_limma" ,     "vst_bmc" ,
+  #                    "rel_clr_combat", "rel_clr_limma", "rel_clr_bmc" ,
+  #                    paste0("clr_pca33",dtype_pca),pca_method_best) 
+  
+  custom_colors = c('#e32f27',"#9A33FF","#F133FF","#3341FF",
+                    "#C3FFCE",'#FF9300','#FFE800','#fdd0a2',
+                    rep("#9A33FF",3),
+                    rep("#F133FF",3),
+                    rep("#3341FF",3),
+                    "#72C1FC","#0093FF")
+  
+  
+  nice_names =  c("Uncorrected","logCPM","VST","CLR","DCC","ComBat","limma","BMC",
                   "logCPM ComBat", "logCPM limma",  "logCPM BMC" ,   "VST ComBat" ,   "VST limma" ,    "VST BMC"  ,     "CLR ComBat" ,   "CLR limma"  ,   "CLR BMC" ,
                   "Fixed PCA Correction","Tuned PCA Correction")
   
@@ -319,11 +353,13 @@ for(a in 1:length(folders)){
     # 
     
     pdf(paste0(data_dir,"/",meas,"LODO_Heatmap_",trans, ".pdf"))
-    heatmap.2(t(input), trace="none", density="none", col=colorRampPalette(c("red","yellow")), cexRow=1.2, cexCol=0.8, 
+    heatmap.2(t(input), trace="none", density="none", cexRow=1.0, cexCol=0.9, 
               margins = margins_list[[folder]],
-              Rowv = FALSE, Colv =  "Rowv",cellnote=t(input_str),notecol="black",srtCol = 45,notecex=notecex_list[[folder]])
+              Rowv = FALSE, Colv =  "Rowv",cellnote=t(input_str),notecol="black",srtCol = 45,notecex=notecex_list[[folder]],
+              dendrogram="none", col=colorRampPalette(c("red","yellow")),
+              breaks=seq(min_col[[folder]],max_col[[folder]],0.01)) #, col=colorRampPalette(c("red","yellow"))
     dev.off()
-    
+    ?heatmap.2
     
     # require("ComplexHeatmap")
     # Heatmap(input, name = "mat", rect_gp = gpar(col = "white", lwd = 2),
@@ -356,6 +392,11 @@ for(a in 1:length(folders)){
   
   
   # built comparisons
+  # my_comparisons  = list()
+  # for(cv in 1:(length(row.names(AUC_results))-1)){
+  #   my_comparisons[[cv]] = c(row.names(AUC_results)[1],row.names(AUC_results)[cv+1])
+  # }
+  
   my_comparisons  = list()
   for(cv in 1:(length(row.names(AUC_results))-1)){
     my_comparisons[[cv]] = c(row.names(AUC_results)[1],row.names(AUC_results)[cv+1])
@@ -367,30 +408,35 @@ for(a in 1:length(folders)){
   #install.packages("ggpubr")
   #'#fdd0a2',"#9A33FF","#F133FF","#3341FF",
   #custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF","#72C1FC","#0093FF")[presence_index]
-  custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF",
-                    rep("#9A33FF",3),
-                    rep("#F133FF",3),
-                    rep("#3341FF",3),
-                    "#72C1FC","#0093FF")[presence_index ]
-  
-  #palette = "jco"
-  p <- ggboxplot(to_plot, x = "Var1", y = "value",
-                 fill = "Var1", palette = custom_colors) +xlab("Correction") + 
-    ylab(paste0("Cross-validated ", meas) ) + 
-    # stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#e32f27",
-    #                    method.args = list(alternative = "greater"),hide.ns=TRUE) + 
-    # stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#808080",
-    #                    method.args = list(alternative = "less"),hide.ns=TRUE) + 
-    stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#86B78F",vjust=1,method.args = list(alternative = "greater")) + 
-    stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#808080",vjust=1,method.args = list(alternative = "less")) + 
-    theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=19),
-          legend.position = "none",
-          panel.grid.major.x = element_blank() ,
-          # explicitly set the horizontal lines (or they will disappear too)
-          panel.grid.major.y = element_line( size=.1, color="black" ))
-  
-  #
-  p
+  # custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF",
+  #                   rep("#9A33FF",3),
+  #                   rep("#F133FF",3),
+  #                   rep("#3341FF",3),
+  #                   "#72C1FC","#0093FF")[presence_index ]
+  custom_colors = c('#e32f27',"#9A33FF","#F133FF","#3341FF",
+  "#C3FFCE",'#FF9300','#FFE800','#fdd0a2',
+  rep("#9A33FF",3),
+  rep("#F133FF",3),
+  rep("#3341FF",3),
+  "#72C1FC","#0093FF")
+  # #palette = "jco"
+  # p <- ggboxplot(to_plot, x = "Var1", y = "value",
+  #                fill = "Var1", palette = custom_colors) +xlab("Correction") + 
+  #   ylab(paste0("Cross-validated ", meas) ) + 
+  #   # stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#e32f27",
+  #   #                    method.args = list(alternative = "greater"),hide.ns=TRUE) + 
+  #   # stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#808080",
+  #   #                    method.args = list(alternative = "less"),hide.ns=TRUE) + 
+  #   stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#86B78F",vjust=1,method.args = list(alternative = "greater")) + 
+  #   stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#808080",vjust=1,method.args = list(alternative = "less")) + 
+  #   theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=19),
+  #         legend.position = "none",
+  #         panel.grid.major.x = element_blank() ,
+  #         # explicitly set the horizontal lines (or they will disappear too)
+  #         panel.grid.major.y = element_line( size=.1, color="black" ))
+  # 
+  # #
+  # p
   my_comparisons_DCC  = list()
   my_comparisons_DCC[[1]] = c("DCC","Fixed PCA Correction")
   
@@ -399,13 +445,18 @@ for(a in 1:length(folders)){
     my_comparisons_Uncorr[[cv]] = c(row.names(AUC_results)[1],row.names(AUC_results)[cv])
   }
   range(to_plot$value)
+  
+  
+  
+  ?stat_compare_means
+  
   p <- ggboxplot(to_plot, x = "Var1", y = "value",
                  fill = "Var1", palette = custom_colors) +xlab("Correction") +
     ylab(paste0("Cross-validated ", meas) ) +
-    #stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#86B78F",vjust=1,method.args = list(alternative = "greater"),hide.ns = TRUE,size=8) +
-    stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#e32f27",vjust=1,method.args = list(alternative = "greater"),hide.ns = TRUE,size=8) +
+    stat_compare_means(ref.group = "DCC",comparison = my_comparisons_DCC,method = "wilcox.test",paired = TRUE,label = "p.signif",col = "#86B78F",vjust=1,method.args = list(alternative = "greater"),hide.ns = FALSE,size=8) +
+    stat_compare_means(ref.group = "Uncorrected",method = "wilcox.test",paired = TRUE, label = "p.signif",col = "#e32f27",vjust=1,method.args = list(alternative = "greater"),hide.ns = TRUE,size=8) +
     #stat_compare_means(ref.group = "DCC",method = "t.test",label = "p.signif",paired=TRUE,col = "#BDBDBD",vjust=1,method.args = list(alternative = "less"),hide.ns = TRUE,size=8) +
-    stat_compare_means(ref.group = "Uncorrected",method = "t.test",label = "p.signif",paired=TRUE,col = "#BDBDBD",vjust=1,method.args = list(alternative = "less"),hide.ns = TRUE,size=8) +
+    stat_compare_means(ref.group = "Uncorrected",method = "wilcox.test",paired = TRUE,label = "p.signif",col = "#BDBDBD",vjust=1,method.args = list(alternative = "less"),hide.ns = TRUE,size=8) +
     theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=19),
           legend.position = "none",
           panel.grid.major.x = element_blank() ,
@@ -417,28 +468,30 @@ for(a in 1:length(folders)){
   # if(grepl("Gibbonsr",folder) & lodo == "True"){
   #   p<- p + ylim(0.53,1.2) 
   # } else 
-  if(grepl("Gibbonsr",folder) & lodo == "False"){
-    p<- p + ylim(0.55,0.93) 
-  }  
-  if(grepl("Gibbonsr",folder) & lodo == "True"){
-    p<- p + ylim(0.50,0.93) 
-  }  
-  if(grepl("Thomasr",folder) & lodo == "True"){
-    p<- p + ylim(0.45, 0.930) 
-  }  
-  if(grepl("Thomasr",folder) & lodo == "False"){
-    p<- p + ylim(0.55,0.90) 
-  }  
-  if(grepl("AGPr",folder) & lodo == "False"){
-    p<- p + ylim(0.47,0.72) 
-  } 
   
-  if(grepl("AGPr",folder) & lodo == "True"){
-    p<- p + ylim(0.48,0.74) 
-  } 
-  if(grepl("Kaplan",folder) & lodo == "True"){
-    p<- p + ylim(-0.1,0.3) 
-  } 
+  
+  # if(grepl("Gibbonsr",folder) & lodo == "False"){
+  #   p<- p + ylim(0.55,0.93)
+  # }
+  # if(grepl("Gibbonsr",folder) & lodo == "True"){
+  #   p<- p + ylim(0.50,0.93)
+  # }
+  # if(grepl("Thomasr",folder) & lodo == "True"){
+  #   p<- p + ylim(0.45, 0.930)
+  # }
+  # if(grepl("Thomasr",folder) & lodo == "False"){
+  #   p<- p + ylim(0.55,0.90)
+  # }
+  # if(grepl("AGPr",folder) & lodo == "False"){
+  #   p<- p + ylim(0.47,0.72)
+  # }
+  # 
+  # if(grepl("AGPr",folder) & lodo == "True"){
+  #   p<- p + ylim(0.48,0.74)
+  # }
+  # if(grepl("Kaplan",folder) & lodo == "True"){
+  #   p<- p + ylim(-0.1,0.3)
+  # }
   #p
   ggsave(plot=p,filename=paste0(data_dir,"/",meas,"_BOX_lodo",lodo,"_trans_",trans, ".pdf"),width = 7,height = 5,units="in")
   
@@ -504,13 +557,30 @@ if(arrange_time){
 # print(cbind(rowMeans(corrections_df[,1:(ncol(corrections_df)-1)]),corrections_df[,ncol(corrections_df)]))
 # 
 # range(to_plot$value)
+require(ggplot2)
+require(ggpubr)
+
 folders1 = c("AGPr_complete_otu","Kaplanr_complete_otu","Thomasr_complete_otu","Gibbonsr_complete_otu")
 folders2 = c("AGPr_max_k5","Kaplanr_max_k5","Thomasr_max_k6","Gibbonsr_max_k5")
+title_ =  c("American Gut Project","Hispanic Community Health Study","CRC-WGS","CRC-16S")
+
+anova_interaction = matrix(nrow=3,ncol=4)
+row.names(anova_interaction) = c("transformation","correction","transformation:correction")
+colnames(anova_interaction) = title_
+
+anova_nointeraction = matrix(nrow=2,ncol=4)
+row.names(anova_nointeraction) = c("transformation","correction")
+colnames(anova_nointeraction) = title_
+
+
 meass = c("AUC","pearson","AUC","AUC")
 comparison = TRUE
 direction= "two.sided"
+require(dplyr)
 if(comparison){
+  
   for(f in 1:length(folders1)){
+    print(folders1[f])
     lodo = TRUE
     trans = "rel"
     meas = meass[f]
@@ -527,44 +597,205 @@ if(comparison){
     data_dir2 = paste0(main_dir,folder2,"/")
     data2 = readRDS(paste0(data_dir2,folder2,"_",meas,"_BOX_",trans, "_lodo_",lodo,  ".rds"))$data
     
-    data1$Var1 = paste0(data1$Var1," S")
+    data1$Var1 = paste0(data1$Var1," t")
     data2$Var1 = paste0(data2$Var1," k")
     my_comparisons <- list()
-    for(u1 in 1:length(methods)){
-      my_comparisons[[u1]] = c(paste0(methods[u1] ," S"),paste0(methods[u1] ," k"))
-    }
+    
+    # for(u1 in 1:length(methods)){
+    #   my_comparisons[[u1]] = c(paste0(methods[u1] ," S"),paste0(methods[u1] ," k"))
+    # }
+    # for(u1 in 1:length(methods)){
+    #   my_comparisons[[u1]] = c("Uncorrected k",paste0(methods[u1] ," k"))
+    # }
+    
+    my_comparisons[[1]] = c("DCC k","Fixed PCA Correction k" )
+    my_comparisons[[2]] = c("DCC t","Fixed PCA Correction t" )
     #custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF","#72C1FC","#0093FF")[presence_index]
-    custom_colors = c('#e32f27',"#C3FFCE",'#FF9300','#FFE800','#fdd0a2',"#9A33FF","#F133FF","#3341FF",
+    
+    custom_colors = c('#e32f27',"#9A33FF","#F133FF","#3341FF",
+                      "#C3FFCE",'#FF9300','#FFE800','#fdd0a2',
                       rep("#9A33FF",3),
                       rep("#F133FF",3),
                       rep("#3341FF",3),
                       "#72C1FC","#0093FF")
-    
     to_plot_ = rbind(data1,data2)
+  
+    # wilcox.test(x = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("Uncorrected t")) %>% select(value))),
+    #             y = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("ComBat t")) %>% select(value))),
+    #             paired = FALSE,alternative="less"
+    # )
+    # t.test(x = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("Uncorrected t")) %>% select(value))),
+    #        y = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("ComBat t")) %>% select(value))),
+    #        paired = TRUE)
     p <- ggboxplot(to_plot_, x = "Var1", y = "value",
                    fill = "Var1", palette = c(custom_colors,custom_colors),
                    lwd=0.2,outlier.size=0.1,outlier.stroke = 0.3) +xlab("Correction") +
       ylab(paste0("Cross-validated ", meas) ) +
+      
+      ggtitle(title_[f]) + 
+      #?stat_compare_means
       # stat_compare_means(comparisons = my_comparisons, method = "t.test",label = "p.signif",paired=TRUE,
       #                    col = "#e32f27",vjust=1,method.args = list(alternative = direction),hide.ns = TRUE,size=2,
       #                    tip.length = 0.05,
       #                    bracket.size = 0.08) +
-      stat_compare_means(ref.group = "Uncorrected S", method = "t.test",label = "p.signif",paired=TRUE,
-                         col = "#e32f27",vjust=1,method.args = list(alternative = "greater"),hide.ns = TRUE,size=2,
+      
+      stat_compare_means(comparisons = my_comparisons, method = "wilcox.test",label = "p.signif",paired=FALSE,
+                         col = "#C3FFCE",vjust=0,method.args = alternative = "greater",hide.ns = FALSE,size=1.8,
                          tip.length = 0.05,
                          bracket.size = 0.08) +
-      theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=4),
-            legend.position = "none",
-            panel.grid.major.x = element_blank() ,
+      # 
+      
+      stat_compare_means(ref.group = "Uncorrected t", method = "wilcox.test",label = "p.signif",paired=FALSE,
+                         col ="#000000",method.args = alternative = "less",hide.ns = FALSE,size=1.8,
+                         tip.length = 0.05,
+                         bracket.size = 0.08, vjust=0.5) +  #,vjust=1.5) +
+      stat_compare_means(ref.group = "Uncorrected t", method = "wilcox.test",label = "p.signif",paired=FALSE,
+                         col = "#e32f27",method.args =alternative = "greater",hide.ns = FALSE,size=1.8,
+                         tip.length = 0.05,
+                         bracket.size = 0.08, vjust=0.5) +  # ,vjust=1.5) +
+      stat_compare_means(ref.group = "Uncorrected k", method = "wilcox.test",label = "p.signif",paired=FALSE,
+                         col = "#BDBDBD" ,method.args = alternative = "less",hide.ns = FALSE,size=1.8,
+                         tip.length = 0.05,
+                         bracket.size = 0.08 , vjust=1) + #,vjust=1) +
+      stat_compare_means(ref.group = "Uncorrected k", method = "wilcox.test",label = "p.signif",paired=FALSE,
+                         col ="#F985AD" ,method.args = alternative = "greater",hide.ns = FALSE,size=1.8,
+                         tip.length = 0.05,
+                         bracket.size = 0.08 ,vjust=1) +  #,vjust=1) +
+      theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=5.8),
+            
+            panel.grid.major.x = element_blank() ,legend.position = "none",
             # explicitly set the horizontal lines (or they will disappear too)
-            panel.grid.major.y = element_line( size=.1, color="black" ))
+            panel.grid.major.y = element_line( size=.1, color="black" ),
+            plot.title = element_text(size=7,face="bold.italic")) #  
     assign(paste0("pair_",folder1), p)
+    
+    #"logCPM","VST","CLR","ComBat","limma","BMC",
+    
+    anova_data = to_plot_ %>% filter(Var1 %in% c(paste0(c("logCPM ComBat", "logCPM limma",  "logCPM BMC" ,   
+                                                          "VST ComBat" ,   "VST limma" ,    "VST BMC"  ,     
+                                                          "CLR ComBat" ,   "CLR limma"  ,   "CLR BMC"  )," S"),
+                                                 paste0(c("logCPM ComBat", "logCPM limma",  "logCPM BMC" ,   
+                                                          "VST ComBat" ,   "VST limma" ,    "VST BMC"  ,     
+                                                          "CLR ComBat" ,   "CLR limma"  ,   "CLR BMC"  )," k")))
+    transformation = sapply(anova_data$Var1, function(x){
+      if(grepl("logCPM",x)){
+        return("logCPM")
+      }else if(grepl("VST",x)){
+        return("VST")
+      }else if(grepl("CLR",x)){
+        return("CLR")
+      }else{
+        return("Non")
+      }
+    })
+    
+    correction = sapply(anova_data$Var1, function(x){
+      if(grepl("BMC",x)){
+        return("BMC")
+      }else if(grepl("ComBat",x)){
+        return("ComBat")
+      }else if(grepl("limma",x)){
+        return("limma")
+      }else{
+        return("Non")
+      }
+    })
+    datatype = sapply(anova_data$Var1, function(x){
+      if(grepl(" k",x)){
+        return("k-mer")
+      }else if(grepl(" t",x)){
+        return("taxa")
+      }
+    })
+    anova_data$transformation = transformation
+    anova_data$correction = correction
+    # head(anova_data)
+    # table( anova_data$tranformation)
+    # table( anova_data$correction)
+    # res.aov <- aov(value ~ transformation + correction, data = anova_data)
+    # print(summary(res.aov))
+    # anova_nointeraction[,f]= summary(res.aov)[[1]][1:2,5]
+    # res.aov <- aov(value ~ transformation + correction + transformation:correction, data = anova_data)
+    # print(summary(res.aov))
+    # 
+    # anova_interaction[,f] =summary(res.aov)[[1]][1:3,5]
+    
+    anova_data$datatype = datatype
+    anova_data$dataset = title_[f]
+    if(f == 1){
+      all_anova_data = anova_data
+    }else{
+      all_anova_data = rbind(all_anova_data,anova_data)
+    }
+    
   }
-  ?ggarrange
   pp <- ggarrange(pair_Kaplanr_complete_otu,pair_AGPr_complete_otu,pair_Thomasr_complete_otu,pair_Gibbonsr_complete_otu,ncol=1)
   ggsave(plot=pp,filename=paste0(main_dir,"AllBox_",direction, ".pdf"))
   #ggsave(plot=pp,filename=paste0(main_dir,"AllBox_",direction, ".pdf"),width = 7,height = 5,units="in")
   
+ 
+ 
 }
-?stat_compare_means
-?wilcox.test
+
+comparison = FALSE
+if(comparison){
+  
+  head(all_anova_data)
+  table(all_anova_data$transformation)
+  table(all_anova_data$dataset)
+  table(all_anova_data$correction)
+  nrow(all_anova_data)
+  119*4
+  table
+  range(all_anova_data$value)
+  res.aov <- aov(value ~ transformation + correction + Error(datatype), data = all_anova_data %>% 
+                   filter(dataset %in% c( "American Gut Project","CRC-16S", "CRC-WGS" )))
+  
+  print(summary(res.aov))
+  
+  ## A simple model with only FE
+  res.aov <- aov(value ~ transformation + correction , data = all_anova_data %>% 
+                   filter(dataset %in% c( "American Gut Project","CRC-16S", "CRC-WGS" )))
+  
+  print(summary(res.aov))
+  require(lme4)
+  dataseries =c("American Gut Project","CRC-16S", "CRC-WGS")
+  # All models below used dataset and data type (k-mer or species) as random effects
+  #Simple Model 1: Model of AUC as a function of transformation used
+  trans_only <- lmer(value ~  1+ transformation + (1|dataset) + (1|datatype), data = all_anova_data %>% 
+                       filter(dataset %in% dataseries), REML=0)
+  #Simple Model 2: Model of AUC as a function of correction method used
+  correction_only <- lmer(value ~  1+ correction + (1|dataset) + (1|datatype), data = all_anova_data %>% 
+                       filter(dataset %in% dataseries ), REML=0)
+  
+  #Complete Model : Model of AUC as a function of transformation applied and correction method used 
+  trans_correction <- lmer(value ~ 1+ transformation + correction + (1|dataset) + (1|datatype), data = all_anova_data %>% 
+                             filter(dataset %in% c( "American Gut Project","CRC-16S", "CRC-WGS" )), REML=0)
+  
+  # ANOVA of Transformation Used  vs Model with Transformation + Correction
+  anova(trans_only, trans_correction )
+  # ANOVA of Correction Used  vs Model with Correction + Transformation
+  anova(correction_only, trans_correction )
+  
+  
+  
+   #Hispanic Community Health Study" 
+  
+  dataseries = c("Hispanic Community Health Study" )
+  # All models below used dataset and data type (k-mer or species) as random effects
+  #Simple Model 1: Model of AUC as a function of transformation used
+  trans_only <- lmer(value ~  1+ transformation + (1|datatype), data = all_anova_data %>% 
+                       filter(dataset %in% dataseries), REML=0)
+  #Simple Model 2: Model of AUC as a function of correction method used
+  correction_only <- lmer(value ~  1+ correction + (1|datatype), data = all_anova_data %>% 
+                            filter(dataset %in% dataseries ), REML=0)
+  
+  #Complete Model : Model of AUC as a function of transformation applied and correction method used 
+  trans_correction <- lmer(value ~ 1+ transformation + correction +  (1|datatype), data = all_anova_data %>% 
+                             filter(dataset %in% dataseries), REML=0)
+  
+  # ANOVA of Transformation Used  vs Model with Transformation + Correction
+  anova(trans_only, trans_correction )
+  # ANOVA of Correction Used  vs Model with Correction + Transformation
+  anova(correction_only, trans_correction )
+}
