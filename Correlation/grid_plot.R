@@ -1,10 +1,42 @@
 #DiseaseState
-gen_path ="/Users/leahbriscoe/Documents/MicroBatch/microbatch_vc/data/" 
+gen_path ="/Users/leahbriscoe/Documents/MicroBatch/microbatch_vc/data/"
+combo = "bio_clr_otu"
+
+
 paths = c(   
-             paste0(gen_path,"Gibbonsr_complete_otu/pca_plot_rel_clr_DiseaseState.rds"),
-             paste0(gen_path,"Thomasr_complete_otu/pca_plot_rel_clr_DiseaseState.rds"),
-          paste0(gen_path,"Kaplanr_complete_otu/pca_plot_rel_clr_bmi_group_HOW.rds"),
-          paste0(gen_path,"AGPr_complete_otu/pca_plot_rel_clr_bin_antibiotic_last_year.rds"))
+      paste0(gen_path,"Gibbonsr_complete_otu/pca_plot_rel_clr_DiseaseState.rds"),
+      paste0(gen_path,"Thomasr_complete_otu/pca_plot_rel_clr_DiseaseState.rds"),
+      paste0(gen_path,"Kaplanr_complete_otu/pca_plot_rel_clr_bmi_group_HOW.rds"),
+      paste0(gen_path,"AGPr_complete_otu/pca_plot_rel_clr_bin_antibiotic_last_year.rds"))
+
+# done
+# if(combo == "bio_clr_otu"){
+#   paths = c(   
+#     paste0(gen_path,"Gibbonsr_complete_otu/pca_plot_rel_clr_DiseaseState.rds"),
+#     paste0(gen_path,"Thomasr_complete_otu/pca_plot_rel_clr_DiseaseState.rds"),
+#     paste0(gen_path,"Kaplanr_complete_otu/pca_plot_rel_clr_bmi_group_HOW.rds"),
+#     paste0(gen_path,"AGPr_complete_otu/pca_plot_rel_clr_bin_antibiotic_last_year.rds"))
+#   
+# }
+# if(combo == "bio_rel_otu"){
+#   paths = c(   
+#     paste0(gen_path,"Gibbonsr_complete_otu/pca_plot_rel_DiseaseState.rds"),
+#     paste0(gen_path,"Thomasr_complete_otu/pca_plot_rel_DiseaseState.rds"),
+#     paste0(gen_path,"Kaplanr_complete_otu/pca_plot_rel_bmi_group_HOW.rds"),
+#     paste0(gen_path,"AGPr_complete_otu/pca_plot_rel_bin_antibiotic_last_year.rds"))
+#   
+# }
+# if(combo == "tech_rel_otu"){
+# }
+# 
+# # done
+# if(combo == "tech_clr_otu"){
+# }
+# if(combo == "bio_clr_k"){
+# }
+# if(combo == "bio_rel_k"){
+# }
+
 # 
 # paths = c(   paste0(gen_path,"Gibbonsr_complete_otu/pca_plot_rel_DiseaseState.rds"),
 #              paste0(gen_path,"Gibbonsr_complete_otu/pca_plot_rel_clr_DiseaseState.rds"),
@@ -166,7 +198,7 @@ g <- ggdraw() + draw_plot(p1,coords_x[1], coords_y[1], 0.5, 0.5,scale=scale4) +
   draw_plot(p3,coords_x[3], coords_y[3], 0.5, 0.5,scale = scale2) + 
   draw_plot(p4,coords_x[4], coords_y[4], 0.5, 0.5,scale = scale1)
 data_dir = "/Users/leahbriscoe/Documents/MicroBatch/microbatch_vc/data/"
-ggsave(g,file=paste0(data_dir,"/pca_plot_bio.pdf"),device ="pdf")
+ggsave(g,file=paste0(data_dir,"/pca_plot_",combo,".pdf"),device ="pdf")
 
 
 

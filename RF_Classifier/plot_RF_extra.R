@@ -202,7 +202,7 @@ if(local){
 
 
 for(a in 1:length(folders)){
-#for(a in 4:4){
+#for(a in c(3,6)){
   args = c(folders[a],"rel","True","AUC")
   pca_methods = pca_methods_list[[a]]
   dtype_pca = dtypes_pca[[a]]
@@ -334,6 +334,8 @@ for(a in 1:length(folders)){
       input = input[,c("Average","FengQ_2015", "ThomasAM_2018b",  "ZellerG_2014", "YuJ_2015" ,  "ThomasAM_2018a" , "VogtmannE_2016"  ,"HanniganGD_2017" )]
     }
     
+    
+    
     colnames(input) = gsub("_", " ", colnames(input))
     colnames(input) = gsub("crc ", "", colnames(input))
     firstup <- function(x) {
@@ -344,7 +346,12 @@ for(a in 1:length(folders)){
     colnames(input) = sapply(colnames(input),firstup)
     
     input_str = apply(input,2, function(x){sprintf("%.2f",round(x,2))})
-    
+    if(grepl("AGP",folder )){
+      input = input[,c("Average","Illumina MiSeq", "Illumina HiSeq 2500", "Illumina HiSeq 2000" )]
+    }
+    if(grepl("Gibbons",folder )){
+      input = input[,c("Average","Zeller", "Baxter", "Zackular" )]
+    }
     # blue palette c("#FFFFFF", "#2B9EDE"
     # dev.off()
     # heatmap.2(t(input), trace="none", density="none", col=colorRampPalette(c("red","yellow")), cexRow=1.2, cexCol=0.8, 
@@ -352,12 +359,43 @@ for(a in 1:length(folders)){
     #           Rowv = FALSE, Colv =  "Rowv",cellnote=t(input_str),notecol="black",srtCol = 45,notecex=0.3)
     # 
     
+    
+    
+    
+    dist =round((max_col[[folder]] -  min_col[[folder]])/2,2)
+    
+    colors = c(seq( min_col[[folder]],(min_col[[folder]]+ dist),length=100),
+               seq((min_col[[folder]]+ dist + 0.01),max_col[[folder]],length=100))
+    my_palette <- colorRampPalette(c("red", "yellow"))(n = 199)
+    
+    # }
+    # # if(grepl("Kaplan",folder1)){
+    # #   p<- p + ylim(-0.1,0.35)
+    # # }
+    # # if(grepl("Thomas",folder1)){
+    # #   p<- p + ylim(0.45,1.0)
+    # # }
+    # if(grepl("Gibbons",folder)){
+    #   colors = c(seq(0.5,0.74,length=100),seq(0.75,1,length=100))
+    #   my_palette <- colorRampPalette(c("red", "yellow"))(n = 199)
+    #  
+    # }
+    # 
+    
     pdf(paste0(data_dir,"/",meas,"LODO_Heatmap_",trans, ".pdf"))
-    heatmap.2(t(input), trace="none", density="none", cexRow=1.0, cexCol=0.9, 
+    heatmap.2(t(input), trace="none", density="none", cexRow=1.0, cexCol=0.9,
               margins = margins_list[[folder]],
               Rowv = FALSE, Colv =  "Rowv",cellnote=t(input_str),notecol="black",srtCol = 45,notecex=notecex_list[[folder]],
               dendrogram="none", col=colorRampPalette(c("red","yellow")),
               breaks=seq(min_col[[folder]],max_col[[folder]],0.01)) #, col=colorRampPalette(c("red","yellow"))
+
+    # heatmap.2(t(input), trace="none", density="none", cexRow=1.0, cexCol=0.9, 
+    #           margins = margins_list[[folder]],
+    #           Rowv = FALSE, Colv =  "Rowv",cellnote=t(input_str),notecol="black",srtCol = 45,notecex=notecex_list[[folder]],
+    #           dendrogram="none", col=my_palette,
+    #           breaks=colors,
+    #           symm=F,symkey=F,symbreaks=T, scale="none") #, col=colorRampPalette(c("red","yellow"))
+    # 
     dev.off()
     ?heatmap.2
     
@@ -561,6 +599,9 @@ require(ggplot2)
 require(ggpubr)
 
 folders1 = c("AGPr_complete_otu","Kaplanr_complete_otu","Thomasr_complete_otu","Gibbonsr_complete_otu")
+# if(grepl("Gibbonsr",folder) & lodo == "False"){
+#   p<- p + ylim(0.55,0.93)
+# }
 folders2 = c("AGPr_max_k5","Kaplanr_max_k5","Thomasr_max_k6","Gibbonsr_max_k5")
 title_ =  c("American Gut Project","Hispanic Community Health Study","CRC-WGS","CRC-16S")
 
@@ -575,11 +616,13 @@ colnames(anova_nointeraction) = title_
 
 meass = c("AUC","pearson","AUC","AUC")
 comparison = TRUE
+k_mer_v_otu = TRUE
 direction= "two.sided"
 require(dplyr)
 if(comparison){
   
   for(f in 1:length(folders1)){
+    f = 2
     print(folders1[f])
     lodo = TRUE
     trans = "rel"
@@ -600,12 +643,15 @@ if(comparison){
     data1$Var1 = paste0(data1$Var1," t")
     data2$Var1 = paste0(data2$Var1," k")
     my_comparisons <- list()
+    my_comparisons_ <- list()
+    
+    for(u1 in 1:length(methods)){
+      my_comparisons_[[u1]] = c(paste0(methods[u1] ," t"),paste0(methods[u1] ," k"))
+    }
+  
     
     # for(u1 in 1:length(methods)){
-    #   my_comparisons[[u1]] = c(paste0(methods[u1] ," S"),paste0(methods[u1] ," k"))
-    # }
-    # for(u1 in 1:length(methods)){
-    #   my_comparisons[[u1]] = c("Uncorrected k",paste0(methods[u1] ," k"))
+    #   my_comparisons_[[u1]] = c("Uncorrected k",paste0(methods[u1] ," k"))
     # }
     
     my_comparisons[[1]] = c("DCC k","Fixed PCA Correction k" )
@@ -619,54 +665,206 @@ if(comparison){
                       rep("#3341FF",3),
                       "#72C1FC","#0093FF")
     to_plot_ = rbind(data1,data2)
+    ?stat_compare_means
   
-    # wilcox.test(x = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("Uncorrected t")) %>% select(value))),
-    #             y = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("ComBat t")) %>% select(value))),
+    # wilcox.test(x = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("DCC t")) %>% select(value))),
+    #             y = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("DCC k")) %>% select(value))),
     #             paired = FALSE,alternative="less"
     # )
     # t.test(x = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("Uncorrected t")) %>% select(value))),
     #        y = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("ComBat t")) %>% select(value))),
     #        paired = TRUE)
-    p <- ggboxplot(to_plot_, x = "Var1", y = "value",
-                   fill = "Var1", palette = c(custom_colors,custom_colors),
-                   lwd=0.2,outlier.size=0.1,outlier.stroke = 0.3) +xlab("Correction") +
-      ylab(paste0("Cross-validated ", meas) ) +
+    methods_char = as.character(methods)
+    if(k_mer_v_otu){
+      new_colors = c()
+      new_order = c()
+      spec_method = c()
+      spec_dtype = c()
       
-      ggtitle(title_[f]) + 
-      #?stat_compare_means
-      # stat_compare_means(comparisons = my_comparisons, method = "t.test",label = "p.signif",paired=TRUE,
-      #                    col = "#e32f27",vjust=1,method.args = list(alternative = direction),hide.ns = TRUE,size=2,
-      #                    tip.length = 0.05,
-      #                    bracket.size = 0.08) +
+      for(m in 1:length(methods_char)){
+        new_order = c(new_order,paste0(methods_char[m],c(" t"," k")))
+        new_colors = c(new_colors,custom_colors[m],custom_colors[m])
+        spec_dtype = c(spec_dtype,c(rep("taxa",length(unique(to_plot_$Var2))),rep("kmer",length(unique(to_plot_$Var2)))))
+        spec_method = c(spec_method,c(rep(methods_char[m],2*length(unique(to_plot_$Var2)))))
+      }
+      to_plot_$Var1 <- factor(to_plot_$Var1,levels = new_order)
+      to_plot_= to_plot_[order(to_plot_$Var1),]
+      to_plot_$meth = spec_method
+      to_plot_$datatype  = spec_dtype
+
+      anno_df = compare_means(value ~ datatype, group.by = "meth",data = to_plot_,
+                              method = "wilcox.test",p.adjust.method = "BH") 
+      anno_df$datatype = anno_df$group2
+      anno_df$Padj_dtype = anno_df$p.signif
       
-      stat_compare_means(comparisons = my_comparisons, method = "wilcox.test",label = "p.signif",paired=FALSE,
-                         col = "#C3FFCE",vjust=0,method.args = alternative = "greater",hide.ns = FALSE,size=1.8,
-                         tip.length = 0.05,
-                         bracket.size = 0.08) +
+      
+      anno_df2 = compare_means(value ~ meth, group.by = "datatype",data = to_plot_,
+                              method = "wilcox.test",p.adjust.method = "BH")
+      anno_df2 = anno_df2 %>% filter(group1 == "Uncorrected")
+      anno_df2$meth = anno_df2$group2
+      anno_df2$Padj_uncorr = anno_df2$p.signif
+      
+      to_plot_ = merge(to_plot_,anno_df2[,c("datatype", "meth","Padj_uncorr")],by=c("datatype", "meth"),all.x = TRUE)
+      to_plot_ = merge(to_plot_,anno_df[,c("datatype", "meth","Padj_dtype")],by=c("datatype", "meth"),all.x = TRUE)
+
+      
+      
+      # ggplot(data = df1, aes(x = Label, y = LFC, 
+      #                        fill = Anticodon,
+      #                        label = ifelse(Padj_uncorr < 0.05, "*", "NS")) # <--- See here 
+      # ) +
+      #   geom_bar(stat = "identity") +
+      #   geom_text(vjust = 0) + # <----------------------------------------- and here
+      #   xlab("tRNA") +
+      #   ylab("Log2FC") +
+      #   ylim(c(-2, 4)) +
+      #   theme_bw() +
+      #   theme(axis.text.x = element_text(size = 12, angle = 45, hjust = 1), 
+      #         plot.margin = margin(0.5, 0.5, 0.5, 2, "cm"))
+      # geom_text(data=aging.sum, aes(label=round(Age,1), y = Age + 3), 
+      #           size=6, position=position_dodge(width=0.8))
+      # 
       # 
       
-      stat_compare_means(ref.group = "Uncorrected t", method = "wilcox.test",label = "p.signif",paired=FALSE,
-                         col ="#000000",method.args = alternative = "less",hide.ns = FALSE,size=1.8,
-                         tip.length = 0.05,
-                         bracket.size = 0.08, vjust=0.5) +  #,vjust=1.5) +
-      stat_compare_means(ref.group = "Uncorrected t", method = "wilcox.test",label = "p.signif",paired=FALSE,
-                         col = "#e32f27",method.args =alternative = "greater",hide.ns = FALSE,size=1.8,
-                         tip.length = 0.05,
-                         bracket.size = 0.08, vjust=0.5) +  # ,vjust=1.5) +
-      stat_compare_means(ref.group = "Uncorrected k", method = "wilcox.test",label = "p.signif",paired=FALSE,
-                         col = "#BDBDBD" ,method.args = alternative = "less",hide.ns = FALSE,size=1.8,
-                         tip.length = 0.05,
-                         bracket.size = 0.08 , vjust=1) + #,vjust=1) +
-      stat_compare_means(ref.group = "Uncorrected k", method = "wilcox.test",label = "p.signif",paired=FALSE,
-                         col ="#F985AD" ,method.args = alternative = "greater",hide.ns = FALSE,size=1.8,
-                         tip.length = 0.05,
-                         bracket.size = 0.08 ,vjust=1) +  #,vjust=1) +
-      theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=5.8),
-            
+      # ,label = paste("(",Padj_uncorr,",",Padj_dtype,")")
+      
+
+
+
+      p <- ggboxplot(to_plot_, x = "Var1", y = "value",
+                     fill = "Var1", palette = new_colors,
+                     lwd=0.2,outlier.size=0.1,outlier.stroke = 0.3) +
+        ylab(paste0("Cross-validated ", meas) ) +geom_text(data = to_plot_,
+                                                           aes(y = max(value),
+                                                               label=Padj_uncorr,,vjust=0)) + 
+        geom_text(data = to_plot_,
+                  aes(y = 0.05,
+                      label=Padj_dtype,vjust=0),colour="red")+
+        
+        ggtitle(title_[f])
+    p
+
+    }else{
+      
+      
+      p <- ggboxplot(to_plot_, x = "Var1", y = "value",
+                     fill = "Var1", palette = c(custom_colors,custom_colors),
+                     lwd=0.2,outlier.size=0.1,outlier.stroke = 0.3) +
+        ylab(paste0("Cross-validated ", meas) ) +
+        
+        ggtitle(title_[f])
+    }
+    
+  
+    if(k_mer_v_otu){
+      
+   
+      
+      dim(to_plot_)
+      
+      
+      # +       # anno_df = compare_means(value ~ datatype, group.by = "meth",data = to_plot_,
+      #   +       #                         method = "wilcox.test",p.adjust.method = "none") %>% mutate(y_pos = 1) 
+      #   +       p <- p +
+      #     +       # +  stat_compare_means(comparisons = my_comparisons, method = "wilcox.test",label = "p.signif",paired=FALSE,
+      #     +       #                              col = "#C3FFCE",vjust=0.1,method.args = list(alternative = "less"),hide.ns = FALSE,size=1.8,
+      #     +       #                              tip.length = 0.05,
+      #     +       #                              bracket.size = 0.1) +
+      #     +         stat_compare_means(comparisons = my_comparisons_, method = "wilcox.test",label = "p.signif",paired=FALSE,
+      #                                  +                            col ="#000000",method.args = list(alternative = "two.sided"),hide.ns = FALSE,size=1.8,
+      #                                  +                            tip.length = 0.05,
+      #                                  +                            bracket.size = 0.08, vjust=0,label.y = max(to_plot_$value) + 0.1)
+      #   +       
+      #     +       
+      #     + 
+      #     +         # ggsignif::geom_signif(inherit.aes = FALSE,
+      #     +         #   data=anno_df,
+      #     +         #   aes(xmin=group1, xmax=group2, annotations=p.adj, y_position=y_pos),
+      #     +         #   manual=TRUE
+      #     +         # )
+     
+  
+    }else{
+      p <- p + 
+        stat_compare_means(comparisons = my_comparisons, method = "wilcox.test",label = "p.signif",paired=FALSE,
+                           col = "#C3FFCE",vjust=0.1,method.args = list(alternative = "less"),hide.ns = FALSE,size=1.8,
+                           tip.length = 0.05,
+                           bracket.size = 0.08) +
+        # 
+        
+        stat_compare_means(ref.group = "Uncorrected t", method = "wilcox.test",label = "p.signif",paired=FALSE,
+                           col ="#000000",method.args = list(alternative = "less"),hide.ns = TRUE,size=1.8,
+                           tip.length = 0.05,
+                           bracket.size = 0.08, vjust=0.5) +  #,vjust=1.5) +
+        stat_compare_means(ref.group = "Uncorrected t", method = "wilcox.test",label = "p.signif",paired=FALSE,
+                           col = "#e32f27",method.args =list(alternative = "greater"),hide.ns = TRUE,size=1.8,
+                           tip.length = 0.05,
+                           bracket.size = 0.08, vjust=0.5) +  # ,vjust=1.5) +
+        stat_compare_means(ref.group = "Uncorrected k", method = "wilcox.test",label = "p.signif",paired=FALSE,
+                           col = "#BDBDBD" ,method.args = list(alternative = "less"),hide.ns = TRUE,size=1.8,
+                           tip.length = 0.05,
+                           bracket.size = 0.08 , vjust=1) + #,vjust=1) +
+        stat_compare_means(ref.group = "Uncorrected k", method = "wilcox.test",label = "p.signif",paired=FALSE,
+                           col ="#F985AD" ,method.args = list(alternative = "greater"),hide.ns = TRUE,size=1.8,
+                           tip.length = 0.05,
+                           bracket.size = 0.08 ,vjust=1)   #,vjust=1) 
+    }
+      
+    
+    if ( f == 4){
+      p <- p + theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=5.8),
             panel.grid.major.x = element_blank() ,legend.position = "none",
             # explicitly set the horizontal lines (or they will disappear too)
             panel.grid.major.y = element_line( size=.1, color="black" ),
-            plot.title = element_text(size=7,face="bold.italic")) #  
+            plot.title = element_text(size=7,face="bold.italic"))  
+    }else{
+      
+    
+      p <- p + theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=5.8),
+                     panel.grid.major.x = element_blank() ,legend.position = "none",
+                     # explicitly set the horizontal lines (or they will disappear too)
+                     panel.grid.major.y = element_line( size=.1, color="black" ),
+                     plot.title = element_text(size=7,face="bold.italic"),axis.title.x=element_blank())
+      
+    }   
+    p
+    
+    if(k_mer_v_otu){
+      if(grepl("AGP",folder1)){
+        p<- p + ylim(0.43,1.0)
+      }
+      if(grepl("Kaplan",folder1)){
+        p<- p + ylim(-0.1,0.55)
+      }
+      if(grepl("Thomas",folder1)){
+        p<- p + ylim(0.45,1.2)
+      }
+      if(grepl("Gibbons",folder1)){
+        p<- p + ylim(0.5,1.2)
+      }
+      if(f == 4){
+        p <- p + xlab("Correction") 
+      }
+    }else{
+      if(grepl("AGP",folder1)){
+        p<- p + ylim(0.43,0.8)
+      }
+      if(grepl("Kaplan",folder1)){
+        p<- p + ylim(-0.1,0.35)
+      }
+      if(grepl("Thomas",folder1)){
+        p<- p + ylim(0.45,1.0)
+      }
+      if(grepl("Gibbons",folder1)){
+        p<- p + ylim(0.5,1)
+      }
+      if(f == 4){
+        p <- p + xlab("Correction") 
+      }
+    }
+    
+    
+    
     assign(paste0("pair_",folder1), p)
     
     #"logCPM","VST","CLR","ComBat","limma","BMC",
@@ -734,7 +932,7 @@ if(comparison){
   #ggsave(plot=pp,filename=paste0(main_dir,"AllBox_",direction, ".pdf"),width = 7,height = 5,units="in")
   
  
- 
+  
 }
 
 comparison = FALSE
