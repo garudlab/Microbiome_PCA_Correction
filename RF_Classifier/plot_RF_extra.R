@@ -482,7 +482,7 @@ for(a in 1:length(folders)){
   for(cv in c(3,4,5,6,8)){
     my_comparisons_Uncorr[[cv]] = c(row.names(AUC_results)[1],row.names(AUC_results)[cv])
   }
-  range(to_plot$value)
+  #range(to_plot$value)
   
   
   
@@ -616,13 +616,14 @@ colnames(anova_nointeraction) = title_
 
 meass = c("AUC","pearson","AUC","AUC")
 comparison = TRUE
-k_mer_v_otu = TRUE
+versionplot = "double_stars"
 direction= "two.sided"
+multi_testing = TRUE
 require(dplyr)
 if(comparison){
   
   for(f in 1:length(folders1)){
-    f = 2
+ 
     print(folders1[f])
     lodo = TRUE
     trans = "rel"
@@ -665,7 +666,7 @@ if(comparison){
                       rep("#3341FF",3),
                       "#72C1FC","#0093FF")
     to_plot_ = rbind(data1,data2)
-    ?stat_compare_means
+    
   
     # wilcox.test(x = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("DCC t")) %>% select(value))),
     #             y = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("DCC k")) %>% select(value))),
@@ -674,8 +675,9 @@ if(comparison){
     # t.test(x = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("Uncorrected t")) %>% select(value))),
     #        y = as.numeric(unlist(to_plot_ %>% filter(Var1 %in% c("ComBat t")) %>% select(value))),
     #        paired = TRUE)
-    methods_char = as.character(methods)
-    if(k_mer_v_otu){
+    
+    if(versionplot == "double_stars" | versionplot == "kmer_v_otu"){
+      methods_char = as.character(methods)
       new_colors = c()
       new_order = c()
       spec_method = c()
@@ -691,76 +693,128 @@ if(comparison){
       to_plot_= to_plot_[order(to_plot_$Var1),]
       to_plot_$meth = spec_method
       to_plot_$datatype  = spec_dtype
-
-      anno_df = compare_means(value ~ datatype, group.by = "meth",data = to_plot_,
-                              method = "wilcox.test",p.adjust.method = "BH") 
+      
+      ?compare_means
+      if(multi_testing){
+        anno_df = compare_means(value ~ datatype, group.by = "meth",data = to_plot_,
+                                method = "wilcox.test",p.adjust.method = "BH") 
+        anno_df2 = compare_means(value ~ meth, group.by = "datatype",data = to_plot_,
+                                 method = "wilcox.test",p.adjust.method = "BH")
+      }else{
+        anno_df = compare_means(value ~ datatype, group.by = "meth",data = to_plot_,
+                                method = "wilcox.test",p.adjust.method = "none") 
+        anno_df2 = compare_means(value ~ meth, group.by = "datatype",data = to_plot_,
+                                 method = "wilcox.test",p.adjust.method = "none")
+      }
+      
       anno_df$datatype = anno_df$group2
       anno_df$Padj_dtype = anno_df$p.signif
       
       
-      anno_df2 = compare_means(value ~ meth, group.by = "datatype",data = to_plot_,
-                              method = "wilcox.test",p.adjust.method = "BH")
+      
       anno_df2 = anno_df2 %>% filter(group1 == "Uncorrected")
       anno_df2$meth = anno_df2$group2
       anno_df2$Padj_uncorr = anno_df2$p.signif
       
       to_plot_ = merge(to_plot_,anno_df2[,c("datatype", "meth","Padj_uncorr")],by=c("datatype", "meth"),all.x = TRUE)
       to_plot_ = merge(to_plot_,anno_df[,c("datatype", "meth","Padj_dtype")],by=c("datatype", "meth"),all.x = TRUE)
-
       
+      new_uncorr = gsub("ns"," ",to_plot_$Padj_uncorr)
+      to_plot_$Padj_uncorr = new_uncorr
       
-      # ggplot(data = df1, aes(x = Label, y = LFC, 
-      #                        fill = Anticodon,
-      #                        label = ifelse(Padj_uncorr < 0.05, "*", "NS")) # <--- See here 
-      # ) +
-      #   geom_bar(stat = "identity") +
-      #   geom_text(vjust = 0) + # <----------------------------------------- and here
-      #   xlab("tRNA") +
-      #   ylab("Log2FC") +
-      #   ylim(c(-2, 4)) +
-      #   theme_bw() +
-      #   theme(axis.text.x = element_text(size = 12, angle = 45, hjust = 1), 
-      #         plot.margin = margin(0.5, 0.5, 0.5, 2, "cm"))
-      # geom_text(data=aging.sum, aes(label=round(Age,1), y = Age + 3), 
-      #           size=6, position=position_dodge(width=0.8))
-      # 
-      # 
-      
-      # ,label = paste("(",Padj_uncorr,",",Padj_dtype,")")
-      
-
-
-
+      new_dtype = gsub("ns"," ",to_plot_$Padj_dtype)
+      to_plot_$Padj_dtype = new_dtype
+      #new_star_dtype = gsub("\\*","†",to_plot_$Padj_dtype)
+    }
+    
+    
+    # ggplot(data = df1, aes(x = Label, y = LFC, 
+    #                        fill = Anticodon,
+    #                        label = ifelse(Padj_uncorr < 0.05, "*", "NS")) # <--- See here 
+    # ) +
+    #   geom_bar(stat = "identity") +
+    #   geom_text(vjust = 0) + # <----------------------------------------- and here
+    #   xlab("tRNA") +
+    #   ylab("Log2FC") +
+    #   ylim(c(-2, 4)) +
+    #   theme_bw() +
+    #   theme(axis.text.x = element_text(size = 12, angle = 45, hjust = 1), 
+    #         plot.margin = margin(0.5, 0.5, 0.5, 2, "cm"))
+    # geom_text(data=aging.sum, aes(label=round(Age,1), y = Age + 3), 
+    #           size=6, position=position_dodge(width=0.8))
+    # 
+    # 
+    
+    # ,label = paste("(",Padj_uncorr,",",Padj_dtype,")")
+    
+    
+    ?geom_text
+    if(versionplot == "kmer_v_otu"){
       p <- ggboxplot(to_plot_, x = "Var1", y = "value",
                      fill = "Var1", palette = new_colors,
                      lwd=0.2,outlier.size=0.1,outlier.stroke = 0.3) +
         ylab(paste0("Cross-validated ", meas) ) +geom_text(data = to_plot_,
                                                            aes(y = max(value),
-                                                               label=Padj_uncorr,,vjust=0)) + 
+                                                               label=Padj_uncorr,vjust=0),size = 0.02) + 
         geom_text(data = to_plot_,
-                  aes(y = 0.05,
-                      label=Padj_dtype,vjust=0),colour="red")+
+                  aes(y = max(value)- 0.05,
+                      label=Padj_dtype,vjust=0),colour="red",size = 0.02)+
         
         ggtitle(title_[f])
-    p
-
-    }else{
+      #p
+    }else if(versionplot == "double_stars"){
+      to_plot_$Var1 = factor(to_plot_$Var1,levels = c(paste0(methods_char," t"),paste0(methods_char," k")))
+      to_plot_= to_plot_[order(to_plot_$Var1),]
+      
+      gapp = 0.01
+      if(grepl("Thomas",folder1)){
+        gapp = 0.1
+        bracket_level = max(to_plot_$value)+0.02
+      }
+      if(grepl("Kaplan",folder1)){
+        bracket_level = max(to_plot_$value) - gapp*2
+      }
+      if(grepl("AGP",folder1)){
+        bracket_level = max(to_plot_$value)
+      }
+      if(grepl("Gibbon",folder1)){
+        bracket_level = max(to_plot_$value) + gapp*2
+      }
+      
+      
+      
+      
       
       
       p <- ggboxplot(to_plot_, x = "Var1", y = "value",
                      fill = "Var1", palette = c(custom_colors,custom_colors),
                      lwd=0.2,outlier.size=0.1,outlier.stroke = 0.3) +
-        ylab(paste0("Cross-validated ", meas) ) +
+        ylab(paste0("Cross-validated ", meas) ) +geom_text(data = to_plot_,
+                                                           aes(y = max(value)+0.02,
+                                                               label=Padj_uncorr,vjust=0),colour="red",size = 1.8) + 
+        geom_text(data = to_plot_,
+                  aes(y = max(value)- gapp,
+                      label=Padj_dtype,vjust=0),colour="grey",size = 1.8)+
         
-        ggtitle(title_[f])
-    }
+        ggtitle(title_[f]) #+ 
+        # stat_compare_means(comparisons = my_comparisons, method = "wilcox.test",label = "p.signif",paired=FALSE,
+        #                    col = "#C3FFCE",vjust=0.1,method.args = list(alternative = "less"),hide.ns = FALSE,size=1.8,
+        #                    tip.length = 0.05,
+        #                    bracket.size = 0.08,label.y =  bracket_level )
+      p
+      
+      # p <- ggboxplot(to_plot_, x = "Var1", y = "value",
+      #                fill = "Var1", palette = c(custom_colors,custom_colors),
+      #                lwd=0.2,outlier.size=0.1,outlier.stroke = 0.3) +
+      #   ylab(paste0("Cross-validated ", meas) ) +
+      #   
+      #   ggtitle(title_[f])
     
   
-    if(k_mer_v_otu){
+    
       
    
       
-      dim(to_plot_)
       
       
       # +       # anno_df = compare_means(value ~ datatype, group.by = "meth",data = to_plot_,
@@ -812,15 +866,21 @@ if(comparison){
       
     
     if ( f == 4){
-      p <- p + theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=5.8),
+      #,text = element_text(size=5.8)
+      p <- p + theme(axis.text = element_text(angle = 45, vjust = 1,hjust = 1,size = 5.8),
+                     axis.title.y = element_text(size=5.8),
+                     axis.title.x = element_text(size=6.5),
             panel.grid.major.x = element_blank() ,legend.position = "none",
             # explicitly set the horizontal lines (or they will disappear too)
             panel.grid.major.y = element_line( size=.1, color="black" ),
             plot.title = element_text(size=7,face="bold.italic"))  
+      
+      ?theme(ac)
     }else{
       
     
-      p <- p + theme(axis.text.x = element_text(angle = 45, vjust = 1,hjust = 1),text = element_text(size=5.8),
+      p <- p + theme(axis.text = element_text(angle = 45, vjust = 1,hjust = 1,size = 5.8),
+                     axis.title.y  = element_text(size=5.8),
                      panel.grid.major.x = element_blank() ,legend.position = "none",
                      # explicitly set the horizontal lines (or they will disappear too)
                      panel.grid.major.y = element_line( size=.1, color="black" ),
@@ -829,39 +889,48 @@ if(comparison){
     }   
     p
     
-    if(k_mer_v_otu){
-      if(grepl("AGP",folder1)){
-        p<- p + ylim(0.43,1.0)
-      }
-      if(grepl("Kaplan",folder1)){
-        p<- p + ylim(-0.1,0.55)
-      }
+    if(versionplot == "double_stars" | versionplot == "kmer_v_otu"){
       if(grepl("Thomas",folder1)){
-        p<- p + ylim(0.45,1.2)
+        p<- p + ylim(min(to_plot_$value),max(to_plot_$value)*1.15)
+      }else if(grepl("Kaplan",folder1)){
+        p <- p + ylim(min(to_plot_$value),max(to_plot_$value)*1.2)
+      }else if(grepl("Gibbon",folder1)){
+        p <- p + ylim(min(to_plot_$value),max(to_plot_$value)*1.1)
       }
-      if(grepl("Gibbons",folder1)){
-        p<- p + ylim(0.5,1.2)
-      }
+      
+      # if(grepl("AGP",folder1)){
+      #   
+      # }
+      # if(grepl("Kaplan",folder1)){
+      #   p<- p + ylim(-0.1,0.55)
+      # }
+      # if(grepl("Thomas",folder1)){
+      #   p<- p + ylim(0.45,1.2)
+      # }
+      # if(grepl("Gibbons",folder1)){
+      #   p<- p + ylim(0.5,1.2)
+      # }
       if(f == 4){
-        p <- p + xlab("Correction") 
-      }
-    }else{
-      if(grepl("AGP",folder1)){
-        p<- p + ylim(0.43,0.8)
-      }
-      if(grepl("Kaplan",folder1)){
-        p<- p + ylim(-0.1,0.35)
-      }
-      if(grepl("Thomas",folder1)){
-        p<- p + ylim(0.45,1.0)
-      }
-      if(grepl("Gibbons",folder1)){
-        p<- p + ylim(0.5,1)
-      }
-      if(f == 4){
-        p <- p + xlab("Correction") 
+        p <- p + xlab("Correction")
       }
     }
+    # }else{
+    #   if(grepl("AGP",folder1)){
+    #     p<- p + ylim(0.43,0.8)
+    #   }
+    #   if(grepl("Kaplan",folder1)){
+    #     p<- p + ylim(-0.1,0.35)
+    #   }
+    #   if(grepl("Thomas",folder1)){
+    #     p<- p + ylim(0.45,1.0)
+    #   }
+    #   if(grepl("Gibbons",folder1)){
+    #     p<- p + ylim(0.5,1)
+    #   }
+    #   if(f == 4){
+    #     p <- p + xlab("Correction") 
+    #   }
+    # }
     
     
     
@@ -871,7 +940,7 @@ if(comparison){
     
     anova_data = to_plot_ %>% filter(Var1 %in% c(paste0(c("logCPM ComBat", "logCPM limma",  "logCPM BMC" ,   
                                                           "VST ComBat" ,   "VST limma" ,    "VST BMC"  ,     
-                                                          "CLR ComBat" ,   "CLR limma"  ,   "CLR BMC"  )," S"),
+                                                          "CLR ComBat" ,   "CLR limma"  ,   "CLR BMC"  )," t"),
                                                  paste0(c("logCPM ComBat", "logCPM limma",  "logCPM BMC" ,   
                                                           "VST ComBat" ,   "VST limma" ,    "VST BMC"  ,     
                                                           "CLR ComBat" ,   "CLR limma"  ,   "CLR BMC"  )," k")))
@@ -935,7 +1004,7 @@ if(comparison){
   
 }
 
-comparison = FALSE
+comparison = TRUE
 if(comparison){
   
   head(all_anova_data)
@@ -957,18 +1026,23 @@ if(comparison){
   
   print(summary(res.aov))
   require(lme4)
+  
+  hist(scale(temp_all_anova_data$value))
   dataseries =c("American Gut Project","CRC-16S", "CRC-WGS")
+  temp_all_anova_data = all_anova_data %>% filter(dataset %in% dataseries)
+  #Null model : (1|dataset) + (1|datatype) + correction + transformation 
+  #Alternative model: (1|dataset) + (1|datatype) + correction + transformation + correction x transformation 
+  
+  
+  temp_all_anova_data$trans_value  = sapply(temp_all_anova_data$value, function(x){log(x/(1-x))})
   # All models below used dataset and data type (k-mer or species) as random effects
   #Simple Model 1: Model of AUC as a function of transformation used
-  trans_only <- lmer(value ~  1+ transformation + (1|dataset) + (1|datatype), data = all_anova_data %>% 
-                       filter(dataset %in% dataseries), REML=0)
+  trans_only <- lmer(trans_value ~  1 + (1|transformation) + (1|dataset) + (1|datatype), data = temp_all_anova_data, REML=0)
   #Simple Model 2: Model of AUC as a function of correction method used
-  correction_only <- lmer(value ~  1+ correction + (1|dataset) + (1|datatype), data = all_anova_data %>% 
-                       filter(dataset %in% dataseries ), REML=0)
+  correction_only <- lmer(trans_value ~ 1 + (1|correction) + (1|dataset) + (1|datatype), data = temp_all_anova_data , REML=0)
   
   #Complete Model : Model of AUC as a function of transformation applied and correction method used 
-  trans_correction <- lmer(value ~ 1+ transformation + correction + (1|dataset) + (1|datatype), data = all_anova_data %>% 
-                             filter(dataset %in% c( "American Gut Project","CRC-16S", "CRC-WGS" )), REML=0)
+  trans_correction <- lmer(value ~ 1 + (1|transformation) + (1|correction)  + (1|dataset) + (1|datatype), data = temp_all_anova_data , REML=0)
   
   # ANOVA of Transformation Used  vs Model with Transformation + Correction
   anova(trans_only, trans_correction )
@@ -980,17 +1054,18 @@ if(comparison){
    #Hispanic Community Health Study" 
   
   dataseries = c("Hispanic Community Health Study" )
+  temp_all_anova_data = all_anova_data %>% filter(dataset %in% dataseries)
+  temp_all_anova_data$scaled_value = scale(temp_all_anova_data$value)
+  
+ 
   # All models below used dataset and data type (k-mer or species) as random effects
   #Simple Model 1: Model of AUC as a function of transformation used
-  trans_only <- lmer(value ~  1+ transformation + (1|datatype), data = all_anova_data %>% 
-                       filter(dataset %in% dataseries), REML=0)
+  trans_only <- lmer(scaled_value ~  1+ (1|transformation) + (1|datatype), data = temp_all_anova_data, REML=0)
   #Simple Model 2: Model of AUC as a function of correction method used
-  correction_only <- lmer(value ~  1+ correction + (1|datatype), data = all_anova_data %>% 
-                            filter(dataset %in% dataseries ), REML=0)
+  correction_only <- lmer(scaled_value ~  1+ (1|correction) + (1|datatype), data = temp_all_anova_data, REML=0)
   
   #Complete Model : Model of AUC as a function of transformation applied and correction method used 
-  trans_correction <- lmer(value ~ 1+ transformation + correction +  (1|datatype), data = all_anova_data %>% 
-                             filter(dataset %in% dataseries), REML=0)
+  trans_correction <- lmer(scaled_value ~ 1+ (1|transformation) + (1|correction) +  (1|datatype), data = temp_all_anova_data, REML=0)
   
   # ANOVA of Transformation Used  vs Model with Transformation + Correction
   anova(trans_only, trans_correction )
