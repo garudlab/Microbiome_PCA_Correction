@@ -620,10 +620,12 @@ versionplot = "double_stars"
 direction= "two.sided"
 multi_testing = TRUE
 require(dplyr)
+check_one_side = TRUE
 if(comparison){
   
   for(f in 1:length(folders1)){
- 
+    
+    f = 2
     print(folders1[f])
     lodo = TRUE
     trans = "rel"
@@ -694,12 +696,23 @@ if(comparison){
       to_plot_$meth = spec_method
       to_plot_$datatype  = spec_dtype
       
-      ?compare_means
+    
+      
       if(multi_testing){
-        anno_df = compare_means(value ~ datatype, group.by = "meth",data = to_plot_,
-                                method = "wilcox.test",p.adjust.method = "BH") 
-        anno_df2 = compare_means(value ~ meth, group.by = "datatype",data = to_plot_,
-                                 method = "wilcox.test",p.adjust.method = "BH")
+        if(check_one_side){
+          anno_df = compare_means(value ~ datatype, group.by = "meth",data = to_plot_,
+                                  method = "wilcox.test",p.adjust.method = "BH",alternative = "greater")
+          anno_df2 = compare_means(value ~ meth, group.by = "datatype",data = to_plot_,
+                                   method = "wilcox.test",p.adjust.method = "BH",alternative = "greater")
+          anno_df2 %>% filter(datatype == "kmer", group1 == "DCC")
+          
+        }else{
+          anno_df = compare_means(value ~ datatype, group.by = "meth",data = to_plot_,
+                                  method = "wilcox.test",p.adjust.method = "BH")
+          anno_df2 = compare_means(value ~ meth, group.by = "datatype",data = to_plot_,
+                                   method = "wilcox.test",p.adjust.method = "BH")
+        }
+        
       }else{
         anno_df = compare_means(value ~ datatype, group.by = "meth",data = to_plot_,
                                 method = "wilcox.test",p.adjust.method = "none") 
@@ -709,15 +722,17 @@ if(comparison){
       
       anno_df$datatype = anno_df$group2
       anno_df$Padj_dtype = anno_df$p.signif
-      
+      anno_df$P_dtype = anno_df$p.format
       
       
       anno_df2 = anno_df2 %>% filter(group1 == "Uncorrected")
       anno_df2$meth = anno_df2$group2
       anno_df2$Padj_uncorr = anno_df2$p.signif
+      anno_df2$P_uncorr = anno_df2$p.format
       
-      to_plot_ = merge(to_plot_,anno_df2[,c("datatype", "meth","Padj_uncorr")],by=c("datatype", "meth"),all.x = TRUE)
-      to_plot_ = merge(to_plot_,anno_df[,c("datatype", "meth","Padj_dtype")],by=c("datatype", "meth"),all.x = TRUE)
+      
+      to_plot_ = merge(to_plot_,anno_df2[,c("datatype", "meth","Padj_uncorr","P_uncorr")],by=c("datatype", "meth"),all.x = TRUE)
+      to_plot_ = merge(to_plot_,anno_df[,c("datatype", "meth","Padj_dtype","P_dtype")],by=c("datatype", "meth"),all.x = TRUE)
       
       new_uncorr = gsub("ns"," ",to_plot_$Padj_uncorr)
       to_plot_$Padj_uncorr = new_uncorr
@@ -726,6 +741,18 @@ if(comparison){
       to_plot_$Padj_dtype = new_dtype
       #new_star_dtype = gsub("\\*","†",to_plot_$Padj_dtype)
     }
+    
+    dim(to_plot_)
+    head(to_plot_)
+    View(to_plot_)
+    test = to_plot_[!duplicated(to_plot_[,c('datatype',"meth","Var1")]),]
+    test$Var1 = factor(test$Var1,levels = new_order)
+    test[order(test$Var1),]
+    
+    aggregate(to_plot_$value,
+              list(box = to_plot_$Var1),
+              median)
+    
     
     
     # ggplot(data = df1, aes(x = Label, y = LFC, 
@@ -747,8 +774,7 @@ if(comparison){
     
     # ,label = paste("(",Padj_uncorr,",",Padj_dtype,")")
     
-    
-    ?geom_text
+  
     if(versionplot == "kmer_v_otu"){
       p <- ggboxplot(to_plot_, x = "Var1", y = "value",
                      fill = "Var1", palette = new_colors,
@@ -801,7 +827,7 @@ if(comparison){
         #                    col = "#C3FFCE",vjust=0.1,method.args = list(alternative = "less"),hide.ns = FALSE,size=1.8,
         #                    tip.length = 0.05,
         #                    bracket.size = 0.08,label.y =  bracket_level )
-      p
+    
       
       # p <- ggboxplot(to_plot_, x = "Var1", y = "value",
       #                fill = "Var1", palette = c(custom_colors,custom_colors),
@@ -887,7 +913,7 @@ if(comparison){
                      plot.title = element_text(size=7,face="bold.italic"),axis.title.x=element_blank())
       
     }   
-    p
+    to_plot_
     
     if(versionplot == "double_stars" | versionplot == "kmer_v_otu"){
       if(grepl("Thomas",folder1)){
@@ -938,10 +964,12 @@ if(comparison){
     
     #"logCPM","VST","CLR","ComBat","limma","BMC",
     
-    anova_data = to_plot_ %>% filter(Var1 %in% c(paste0(c("logCPM ComBat", "logCPM limma",  "logCPM BMC" ,   
+    anova_data = to_plot_ %>% filter(Var1 %in% c(paste0(c("ComBat","limma","BMC",
+                                                          "logCPM ComBat", "logCPM limma",  "logCPM BMC" ,   
                                                           "VST ComBat" ,   "VST limma" ,    "VST BMC"  ,     
                                                           "CLR ComBat" ,   "CLR limma"  ,   "CLR BMC"  )," t"),
-                                                 paste0(c("logCPM ComBat", "logCPM limma",  "logCPM BMC" ,   
+                                                 paste0(c("ComBat","limma","BMC",
+                                                          "logCPM ComBat", "logCPM limma",  "logCPM BMC" ,   
                                                           "VST ComBat" ,   "VST limma" ,    "VST BMC"  ,     
                                                           "CLR ComBat" ,   "CLR limma"  ,   "CLR BMC"  )," k")))
     transformation = sapply(anova_data$Var1, function(x){
@@ -1026,49 +1054,61 @@ if(comparison){
   
   print(summary(res.aov))
   require(lme4)
+  result_type = "Pearson" #"AUC" #
+  if(result_type == "Pearson"){
+    dataseries = c("Hispanic Community Health Study" )
+    temp_all_anova_data = all_anova_data %>% filter(dataset %in% dataseries)
+    temp_all_anova_data$trans_value  = sapply(temp_all_anova_data$value, function(x){
+      0.5* (log(1+x) - log(1-x))})
+    
+    temp_all_anova_data$bin_trans= sapply(temp_all_anova_data$transformation, function(x){
+      if(x == "Non"){
+        return(0)
+      }else{return(1)}})
+    
+    hist(temp_all_anova_data$trans_value )
+    
+    # All models below used dataset and data type (k-mer or species) as random effects
+    #Simple Model 1: Model of AUC as a function of transformation used
+    null_model <- lmer(trans_value ~ (1|datatype) + correction + bin_trans , data = temp_all_anova_data, REML=0)
+    #Simple Model 2: Model of AUC as a function of correction method used
+    alt_model <- lmer(trans_value ~ (1|datatype) + correction + bin_trans  + correction*bin_trans , data = temp_all_anova_data , REML=0)
+    
+    #
+    table(temp_all_anova_data$bin_trans)
+   
+  }else{
+    dataseries =c("American Gut Project","CRC-16S", "CRC-WGS")
+    temp_all_anova_data = all_anova_data %>% filter(dataset %in% dataseries)
+    temp_all_anova_data$trans_value  = sapply(temp_all_anova_data$value, function(x){log(x/(1-x))})
+    
+    temp_all_anova_data$bin_trans= sapply(temp_all_anova_data$transformation, function(x){
+      if(x == "Non"){
+        return(0)
+      }else{return(1)}})
+    
+    # All models below used dataset and data type (k-mer or species) as random effects
+    #Simple Model 1: Model of AUC as a function of transformation used
+    null_model <- lmer(trans_value ~  (1|dataset) + (1|datatype) + correction + bin_trans , data = temp_all_anova_data, REML=0)
+    #Simple Model 2: Model of AUC as a function of correction method used
+    alt_model <- lmer(trans_value ~ (1|dataset) + (1|datatype) + correction + bin_trans  + correction*bin_trans , data = temp_all_anova_data , REML=0)
+    
+    #
+  }
+  #
   
-  hist(scale(temp_all_anova_data$value))
-  dataseries =c("American Gut Project","CRC-16S", "CRC-WGS")
-  temp_all_anova_data = all_anova_data %>% filter(dataset %in% dataseries)
   #Null model : (1|dataset) + (1|datatype) + correction + transformation 
   #Alternative model: (1|dataset) + (1|datatype) + correction + transformation + correction x transformation 
   
   
-  temp_all_anova_data$trans_value  = sapply(temp_all_anova_data$value, function(x){log(x/(1-x))})
-  # All models below used dataset and data type (k-mer or species) as random effects
-  #Simple Model 1: Model of AUC as a function of transformation used
-  trans_only <- lmer(trans_value ~  1 + (1|transformation) + (1|dataset) + (1|datatype), data = temp_all_anova_data, REML=0)
-  #Simple Model 2: Model of AUC as a function of correction method used
-  correction_only <- lmer(trans_value ~ 1 + (1|correction) + (1|dataset) + (1|datatype), data = temp_all_anova_data , REML=0)
-  
-  #Complete Model : Model of AUC as a function of transformation applied and correction method used 
-  trans_correction <- lmer(value ~ 1 + (1|transformation) + (1|correction)  + (1|dataset) + (1|datatype), data = temp_all_anova_data , REML=0)
   
   # ANOVA of Transformation Used  vs Model with Transformation + Correction
-  anova(trans_only, trans_correction )
+  anova(null_model , alt_model )
+  null_model
   # ANOVA of Correction Used  vs Model with Correction + Transformation
   anova(correction_only, trans_correction )
   
   
   
-   #Hispanic Community Health Study" 
-  
-  dataseries = c("Hispanic Community Health Study" )
-  temp_all_anova_data = all_anova_data %>% filter(dataset %in% dataseries)
-  temp_all_anova_data$scaled_value = scale(temp_all_anova_data$value)
-  
- 
-  # All models below used dataset and data type (k-mer or species) as random effects
-  #Simple Model 1: Model of AUC as a function of transformation used
-  trans_only <- lmer(scaled_value ~  1+ (1|transformation) + (1|datatype), data = temp_all_anova_data, REML=0)
-  #Simple Model 2: Model of AUC as a function of correction method used
-  correction_only <- lmer(scaled_value ~  1+ (1|correction) + (1|datatype), data = temp_all_anova_data, REML=0)
-  
-  #Complete Model : Model of AUC as a function of transformation applied and correction method used 
-  trans_correction <- lmer(scaled_value ~ 1+ (1|transformation) + (1|correction) +  (1|datatype), data = temp_all_anova_data, REML=0)
-  
-  # ANOVA of Transformation Used  vs Model with Transformation + Correction
-  anova(trans_only, trans_correction )
-  # ANOVA of Correction Used  vs Model with Correction + Transformation
-  anova(correction_only, trans_correction )
+
 }
